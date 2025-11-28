@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poke House – Monte a Bowl</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'bounce-in': 'bounceIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both',
+                        'shake': 'shake 0.8s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        bounceIn: {
+                            '0%': { opacity: '0', transform: 'scale3d(0.3, 0.3, 0.3)' },
+                            '20%': { transform: 'scale3d(1.1, 1.1, 1.1)' },
+                            '40%': { transform: 'scale3d(0.9, 0.9, 0.9)' },
+                            '60%': { opacity: '1', transform: 'scale3d(1.03, 1.03, 1.03)' },
+                            '80%': { transform: 'scale3d(0.97, 0.97, 0.97)' },
+                            '100%': { opacity: '1', transform: 'scale3d(1, 1, 1)' }
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #ffe6f2; }
+        .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- ÍCONES (Inline SVG para evitar dependências externas) ---
+        const IconHome = ({ size = 24 }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        );
+        const IconArrowLeft = ({ size = 24 }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        );
+
+        // --- DADOS DO JOGO ---
+        const INGREDIENTS_DB = {
+            bases: ["Arroz de sushi", "Arroz preto", "Quinoa", "Arroz basmati", "Coconut Basmati", "Espinafres", "Winter Salad"],
+            sauces_base: ["Azeite", "Azeite de Limão", "Vinagrete", "Ponzu", "Sriracha mayo", "Não leva"],
+            greens: [
+                "Batata Doce com Alecrim", "Brócolis", "Pickle Cebola", "Beterraba", "Cenoura c/ soja", "Milho", "Abacaxi",
+                "Edamame", "Tomate cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta",
+                "Jalapeños", "Azeitonas", "Abacate", "Philadelphia", "Wakame", "Manga", "Hummus", "Tomate"
+            ],
+            proteins: [
+                "Salmão Braseado", "Filé de Salmão", "Frango Vietnamita", "Camarão Panado", "Frango", "Frango Teriyaki",
+                "Camarão", "Juicy Salmon", "Juicy Tuna", "Salmão", "Atum", "Tofu Grelhado", "Ovo", "Não leva"
+            ],
+            sauces_final: [
+                "Creamy Caesar", "Creme de Abacate", "Spicy Peanuts", "Mel", "Chipotle", "Sésamo Shoyu", "Sriracha Mayo",
+                "Wasabi Mayo", "Azeite", "Azeite de Limão", "Manjericão e Hortelã", "Vinagrete", "Soja", "Teriyaki",
+                "Ponzu", "Especial", "Mint"
+            ],
+            crispies: [
+                "Cebola frita", "Ervilhas Wasabi", "Algas Nori", "Amêndoa", "Batata Doce", "Lima", "Bacon", "Croutons",
+                "Alho Crocante", "Batata doce crocante", "Não leva", "Cebola Crocante"
+            ],
+            sesame: ["Sim", "Não"]
+        };
+
+        const RECIPES = [
+            { id: 1, name: "Sunny Salmon 🌞", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de abacate"], crispy: ["Não leva"], sesame: ["Sim"] },
+            { id: 2, name: "Spicy Tuna 🐟", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Pepino", "Cenoura"], protein: ["Atum", "Atum"], sauce_final: ["Ponzu", "Spicy Peanuts"], crispy: ["Cebola frita"], sesame: ["Sim"] },
+            { id: 3, name: "Vegetarian 🌿", base: ["Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Tomate", "Pepino", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Mint"], crispy: ["Batata doce crocante"], sesame: ["Sim"] },
+            { id: 4, name: "Chicken 🐔", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Tomate cherry", "Courgette"], protein: ["Frango Teriyaki", "Frango Teriyaki"], sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Amêndoa"], sesame: ["Sim"] },
+            { id: 5, name: "Fire Salmon 🔥", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Sriracha mayo"], greens: ["Jalapeños", "Tomate cherry", "Pepino"], protein: ["Salmão", "Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Cebola frita"], sesame: ["Sim"] },
+            { id: 6, name: "Mixed Seas 🌊", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] },
+            { id: 7, name: "Crispy Shrimp 🦐", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino"], protein: Array(8).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] },
+            { id: 8, name: "Salmon Sushi 🍣", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] },
+            { id: 9, name: "The Caesar 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Tomate", "Tomate", "Grana Padano"], protein: ["Frango", "Frango", "Frango"], sauce_final: ["Creamy Caesar"], crispy: ["Bacon", "Croutons"], sesame: ["Não"] },
+            { id: 10, name: "Exotic Salmon 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Sim"] },
+            { id: 11, name: "Velvet Garden 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Sim"] },
+            { id: 12, name: "Cozy Chicken 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Sim"] }
+        ];
+
+        const PHASES = [
+            { key: "base", title: "1️⃣ – Base:", hint: "Escolha as bases." },
+            { key: "sauce_base", title: "2️⃣ – Molho da base:", hint: "Escolha o molho." },
+            { key: "greens", title: "3️⃣ – Greens:", hint: "Escolha os greens." },
+            { key: "protein", title: "4️⃣ – Proteína:", hint: "Escolha as proteínas." },
+            { key: "sauce_final", title: "5️⃣ – Molho final:", hint: "Escolha os molhos." },
+            { key: "crispy", title: "6️⃣ – Crispy:", hint: "Escolha UM crispy." },
+            { key: "sesame", title: "7️⃣ – Sésamo:", hint: "Essa Bowl leva sésamo?" },
+        ];
+
+        // --- LÓGICA DE SOM ---
+        const playSound = (type) => {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === "happy") {
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                osc.start(); osc.stop(ctx.currentTime + 0.1);
+            } else {
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(300, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(); osc.stop(ctx.currentTime + 0.3);
+            }
+        };
+
+        // --- COMPONENTE DE FUNDO (MAR) ---
+        const OceanBackground = () => {
+            const canvasRef = React.useRef(null);
+
+            React.useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext("2d");
+                const waves = [
+                    { color: "#FF7CA8", baseYFactor: 0.9, amplitude: 4, wavelength: 40, speed: 0.6 },
+                    { color: "#FFA3C2", baseYFactor: 0.8, amplitude: 3, wavelength: 55, speed: 0.35 },
+                    { color: "#FFD0E3", baseYFactor: 0.7, amplitude: 2, wavelength: 70, speed: 0.18 },
+                ];
+                let fishes = [];
+                let splashes = [];
+
+                const createFish = (stagger = 0) => ({
+                    jumping: false, jumpTime: 0, nextSpawn: 120 + Math.random() * 240 + stagger,
+                    x: 0, y: 0, baseY: 0, jumpDuration: 70 + Math.random() * 40,
+                    jumpHeight: 22 + Math.random() * 18, sizeScale: 0.8 + Math.random() * 1.2
+                });
+
+                for (let i = 0; i < 6; i++) fishes.push(createFish(i * 20));
+
+                const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                window.addEventListener("resize", resize);
+                resize();
+
+                const loop = (now) => {
+                    const t = now / 1000;
+                    ctx.fillStyle = "#FFE6F2";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Desenhar ondas e peixes
+                    waves.forEach((w, i) => { if (i !== 0) drawWave(ctx, w, t, canvas.width, canvas.height); });
+                    fishes.forEach(f => updateFish(f, canvas.width, canvas.height, waves[1], splashes));
+                    splashes = splashes.filter(s => s.particles.length > 0);
+                    splashes.forEach(s => updateAndDrawSplash(ctx, s));
+                    fishes.forEach(f => { if (f.jumping) drawFish(ctx, f); });
+                    drawWave(ctx, waves[0], t, canvas.width, canvas.height);
+                    requestAnimationFrame(loop);
+                };
+                requestAnimationFrame(loop);
+                return () => window.removeEventListener("resize", resize);
+            }, []);
+
+            return <canvas ref={canvasRef} style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', zIndex:-1}} />;
+        };
+
+        // Helpers Canvas
+        function drawWave(ctx, w, t, width, height) {
+            ctx.fillStyle = w.color; ctx.beginPath(); ctx.moveTo(0, height);
+            const baseY = height * w.baseYFactor;
+            for (let x = 0; x <= width; x += 10) ctx.lineTo(x, baseY + Math.sin(x / w.wavelength + t * w.speed) * w.amplitude);
+            ctx.lineTo(width, height); ctx.fill();
+        }
+        function updateFish(f, w, h, wave, splashes) {
+            if (!f.jumping) {
+                f.nextSpawn--;
+                if (f.nextSpawn <= 0) { f.jumping = true; f.jumpTime = 0; f.x = 20 + Math.random() * (w - 40); f.baseY = h * wave.baseYFactor - 5; f.nextSpawn = 240 + Math.random() * 240; }
+            } else {
+                f.jumpTime++; const t = f.jumpTime / f.jumpDuration; f.y = f.baseY - Math.sin(Math.PI * t) * f.jumpHeight;
+                if (t >= 1) { f.jumping = false; splashes.push({ particles: Array(6).fill(0).map(() => ({ x: f.x, y: f.baseY, vx: (Math.random()-0.5)*2, vy: -Math.random()*3-1, life: 30 })) }); }
+            }
+        }
+        function drawFish(ctx, f) { ctx.font = `${Math.max(14, f.sizeScale * 20)}px sans-serif`; ctx.fillText("🐟", f.x, f.y); }
+        function updateAndDrawSplash(ctx, s) {
+            s.particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--; ctx.fillStyle = `rgba(255,255,255,${p.life/30})`; ctx.fillRect(p.x, p.y, 2, 2); });
+        }
+
+        // --- APP PRINCIPAL ---
+        function App() {
+            const [gameState, setGameState] = React.useState("HOME");
+            const [selectedRecipe, setSelectedRecipe] = React.useState(null);
+            const [currentPhaseIndex, setCurrentPhaseIndex] = React.useState(0);
+            const [currentSelections, setCurrentSelections] = React.useState([]);
+            const [allSelections, setAllSelections] = React.useState({});
+            const [timer, setTimer] = React.useState(20);
+            const [timerEmoji, setTimerEmoji] = React.useState("😃");
+            const [errorDetails, setErrorDetails] = React.useState([]);
+
+            React.useEffect(() => {
+                if (gameState !== "PLAYING") return;
+                if (timer > 12) setTimerEmoji("😃"); else if (timer > 7) setTimerEmoji("🤨"); else if (timer > 4) setTimerEmoji("😬"); else setTimerEmoji("😱");
+                if (timer === 0) { handleGameOver(false, ["Tempo esgotado!"]); return; }
+                const interval = setInterval(() => setTimer(t => t - 1), 1000);
+                return () => clearInterval(interval);
+            }, [timer, gameState]);
+
+            const startGame = (recipe) => {
+                setSelectedRecipe(recipe); setGameState("PLAYING"); setCurrentPhaseIndex(0); setCurrentSelections([]); setAllSelections({}); setTimer(20);
+            };
+
+            const handleSelection = (ingredient) => {
+                setTimer(20);
+                const phase = PHASES[currentPhaseIndex];
+                const requiredList = selectedRecipe[phase.key];
+                const isCorrect = requiredList.includes(ingredient);
+                playSound(isCorrect ? "happy" : "sad");
+
+                const newSelections = [...currentSelections, ingredient];
+                setCurrentSelections(newSelections);
+
+                if (newSelections.length === selectedRecipe[phase.key].length) {
+                    const updatedAll = { ...allSelections, [phase.key]: newSelections };
+                    setAllSelections(updatedAll);
+                    if (currentPhaseIndex < PHASES.length - 1) {
+                        setTimeout(() => { setCurrentPhaseIndex(prev => prev + 1); setCurrentSelections([]); setTimer(20); }, 300);
+                    } else {
+                        validateGame(updatedAll);
+                    }
+                }
+            };
+
+            const handleUndo = () => { if (currentSelections.length > 0) { const newSel = [...currentSelections]; newSel.pop(); setCurrentSelections(newSel); } };
+
+            const validateGame = (finalSelections) => {
+                let errors = [];
+                PHASES.forEach(phase => {
+                    const required = [...selectedRecipe[phase.key]].sort();
+                    const selected = [...finalSelections[phase.key]].sort();
+                    if (JSON.stringify(required) !== JSON.stringify(selected)) errors.push(`Erro em ${phase.title.replace(":", "")}. Era: ${required.join(", ")}`);
+                });
+                handleGameOver(errors.length === 0, errors);
+            };
+
+            const handleGameOver = (success, errors) => {
+                if (success) {
+                    setGameState("RESULT_SUCCESS"); playSound("happy");
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    setTimeout(() => setGameState("HOME"), 10000);
+                } else {
+                    setErrorDetails(errors); setGameState("RESULT_FAIL"); playSound("sad");
+                    setTimeout(() => setGameState("HOME"), 20000);
+                }
+            };
+
+            // Render Helper
+            const getIngredients = (key) => {
+                 switch(key) {
+                    case 'base': return INGREDIENTS_DB.bases;
+                    case 'sauce_base': return INGREDIENTS_DB.sauces_base;
+                    case 'greens': return INGREDIENTS_DB.greens;
+                    case 'protein': return INGREDIENTS_DB.proteins;
+                    case 'sauce_final': return INGREDIENTS_DB.sauces_final;
+                    case 'crispy': return INGREDIENTS_DB.crispies;
+                    case 'sesame': return INGREDIENTS_DB.sesame;
+                    default: return [];
+                }
+            };
+
+            return (
+                <div className="min-h-screen w-full font-sans text-slate-800 relative overflow-hidden flex flex-col md:flex-row">
+                    <OceanBackground />
+                    
+                    {/* MENU */}
+                    <div className={`p-4 md:w-1/4 md:h-screen md:overflow-y-auto flex flex-col gap-2 transition-all duration-500 z-10 bg-white/60 backdrop-blur-md border-r border-white/40 ${gameState === "HOME" ? "w-full h-full" : "h-auto md:h-full"}`}>
+                        <h1 className="text-2xl font-bold mb-4 text-[#404fc2] text-center md:text-left">Poke House <br/><span className="text-lg font-normal">Monte a Bowl 🥗</span></h1>
+                        <div className={`grid gap-3 ${gameState === "HOME" ? "grid-cols-1" : "grid-cols-2 md:grid-cols-1"}`}>
+                            {RECIPES.map(recipe => (
+                                <button key={recipe.id} onClick={() => startGame(recipe)} disabled={gameState === "PLAYING" && selectedRecipe?.id !== recipe.id} className={`p-3 rounded-xl shadow-sm text-left font-semibold transition-all ${selectedRecipe?.id === recipe.id ? "bg-[#7da9e3] text-white scale-105" : "bg-white/80 hover:bg-white text-slate-700"} ${gameState === "PLAYING" && selectedRecipe?.id !== recipe.id ? "opacity-50 hidden md:block" : ""}`}>
+                                    {recipe.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* JOGO */}
+                    <div className="flex-1 p-4 md:p-8 relative z-10 flex flex-col items-center justify-center">
+                        {gameState === "PLAYING" && (
+                            <div className="w-full max-w-4xl bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 animate-fade-in">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-[#404fc2]">{PHASES[currentPhaseIndex].title}</h2>
+                                        <p className="text-slate-600">{PHASES[currentPhaseIndex].hint}</p>
+                                        <div className="text-sm mt-1 font-bold text-[#7da9e3]">Selecionado: {currentSelections.length} / {selectedRecipe[PHASES[currentPhaseIndex].key].length}</div>
+                                    </div>
+                                    <div className="flex flex-col items-center"><span className="text-4xl">{timerEmoji}</span><span className="text-2xl font-bold text-[#404fc2]">{timer}s</span></div>
+                                </div>
+                                <div className={`grid gap-3 mb-8 ${PHASES[currentPhaseIndex].key === 'greens' ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
+                                    {getIngredients(PHASES[currentPhaseIndex].key).map(ing => {
+                                        const count = currentSelections.filter(i => i === ing).length;
+                                        const isNoLeva = ing === "Não leva" || ing === "Não";
+                                        return (
+                                            <button key={ing} onClick={() => handleSelection(ing)} className={`relative p-4 rounded-xl font-bold text-sm md:text-base transition-all active:scale-95 flex items-center justify-center text-center h-20 md:h-24 shadow-sm ${isNoLeva ? "bg-[#5b9ed9] text-white hover:bg-[#4a8cc7]" : "bg-white text-slate-700 hover:bg-[#f0f9ff] border-2 border-transparent hover:border-[#7da9e3]"}`}>
+                                                {ing}
+                                                {count > 0 && <span className="absolute -top-2 -right-2 bg-[#404fc2] text-white text-xs w-6 h-6 flex items-center justify-center rounded-full border-2 border-white">{count}</span>}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                                <div className="flex justify-between mt-auto">
+                                    <button onClick={() => setGameState("HOME")} className="flex items-center gap-2 text-[#404fc2] font-bold hover:underline"><IconHome size={20}/> INÍCIO</button>
+                                    <button onClick={handleUndo} disabled={currentSelections.length === 0} className="flex items-center gap-2 px-6 py-2 bg-slate-200 rounded-full font-bold text-slate-600 disabled:opacity-50 hover:bg-slate-300"><IconArrowLeft size={20}/> Desfazer</button>
+                                </div>
+                            </div>
+                        )}
+                        {gameState === "RESULT_SUCCESS" && (
+                            <div className="text-center p-10 bg-white/90 rounded-3xl shadow-2xl animate-bounce-in">
+                                <h2 className="text-4xl font-extrabold text-[#03fc8c] mb-4 drop-shadow-sm">Perfeita! 🤩</h2>
+                                <p className="text-xl text-slate-700 mb-6">Sua bowl foi montada corretamente!</p>
+                                <div className="flex justify-center gap-4 text-4xl animate-pulse"><span>💖</span><span>🐟</span><span>🥑</span></div>
+                            </div>
+                        )}
+                        {gameState === "RESULT_FAIL" && (
+                            <div className="text-center p-10 bg-white/90 rounded-3xl shadow-2xl animate-shake">
+                                <h2 className="text-3xl font-extrabold text-[#cc3d49] mb-4">Eita... 😕</h2>
+                                <p className="text-lg text-slate-700 mb-6">Alguns ingredientes estão incorretos!</p>
+                                <div className="bg-red-50 p-4 rounded-lg text-left text-sm text-red-800 mb-6 max-h-40 overflow-y-auto">{errorDetails.map((e, i) => <div key={i}>• {e}</div>)}</div>
+                                <p className="text-sm text-slate-500">Reiniciando em instantes...</p>
+                            </div>
+                        )}
+                        {gameState === "HOME" && (
+                            <div className="hidden md:block text-center bg-white/40 p-8 rounded-xl backdrop-blur-sm">
+                                <p className="text-[#404fc2] font-bold text-xl">Selecione uma receita ao lado para começar!</p>
+                                <div className="mt-4 text-4xl animate-bounce">🥗</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+</html>
