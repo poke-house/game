@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poke House – Monte a Bowl v1.16</title>
+    <title>Poke House – Monte a Bowl v1.18</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -74,8 +74,8 @@
         const IconRotate = ({ size = 20, color = "currentColor" }) => (
              <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         );
-        const IconTrophy = ({ size = 24, color = "currentColor" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        const IconCheck = ({ size = 24, color = "currentColor" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         );
 
         // --- DADOS ATUALIZADOS ---
@@ -118,7 +118,7 @@
             // GREEN BOWLS
             { id: 9, category: "GREEN", name: "The Caesar 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Tomate Cherry", "Tomate Cherry", "Grana Padano"], protein: ["Frango", "Frango", "Frango"], sauce_final: ["Creamy Caesar"], crispy: ["Bacon", "Croutons", "Lima"], sesame: ["Não"] },
             { id: 10, category: "GREEN", name: "Exotic Salmon 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] },
-            { id: 11, category: "GREEN", name: "Velvet Garden 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] },
+            { id: 11, category: "GREEN", name: "Velvet Garden 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] },
             { id: 12, category: "GREEN", name: "Cozy Chicken 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Não"] }
         ];
 
@@ -204,13 +204,9 @@
                     return { 
                         x: startSide === 'LEFT' ? -150 : canvas.width + 150, 
                         y: spawnY,
-                        // Velocidade bem mais lenta
                         speedX: (startSide === 'LEFT' ? 1 : -1) * (0.4 + Math.random() * 0.4), 
-                        // Direção vertical inicial (1 = desce, -1 = sobe)
                         verticalDir: Math.random() > 0.5 ? 1 : -1,
-                        // Velocidade vertical relativa
                         verticalSpeedFactor: 0.3 + Math.random() * 0.3,
-                        // Timer para mudar o zigzag
                         zigzagTimer: 0,
                         zigzagInterval: 150 + Math.floor(Math.random() * 150),
                         sprite: SURFER_EMOJIS[Math.floor(Math.random() * SURFER_EMOJIS.length)],
@@ -232,11 +228,9 @@
                     const horizonY = h * skyHeightRatio;
                     const seaBottomY = h;
 
-                    // 1. Céu
                     ctx.fillStyle = skyColor; 
                     ctx.fillRect(0, 0, canvas.width, horizonY + 10); 
 
-                    // 2. Mar
                     seaLayers.forEach(layer => {
                         const startY = h * layer.startYRatio;
                         const endY = h * layer.endYRatio;
@@ -253,8 +247,7 @@
                         if(layer.endYRatio === 1.0) ctx.fillRect(0, endY - 1, canvas.width, h - endY + 1);
                     });
                     
-                    // 3. Surfistas
-                    if (surfers.length < 2 && Math.random() < 0.005) { // Menor chance de spawn para não lotar com a velocidade lenta
+                    if (surfers.length < 2 && Math.random() < 0.005) { 
                         surfers.push(createSurfer());
                     }
 
@@ -273,47 +266,33 @@
             return <canvas ref={canvasRef} style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', zIndex:-1}} />;
         };
         
-        // Nova lógica de movimento Zigzag Lento com restrição de horizonte e tremido
         function updateSurfer(f, w, h, horizonY, seaBottomY, t){ 
             f.trail.push({x: f.x, y: f.y});
-            if (f.trail.length > 30) f.trail.shift(); // Rastro um pouco mais longo
+            if (f.trail.length > 30) f.trail.shift();
 
-            // Movimento Horizontal Constante (Lento)
             f.x += f.speedX;
 
-            // Lógica Zigzag Vertical
             f.zigzagTimer++;
             
-            // Calcula a próxima posição Y potencial
             let nextY = f.y + (f.speedX * f.verticalDir * f.verticalSpeedFactor);
 
-            // Margem de segurança do horizonte (para não tocar na onda)
             const safetyMarginTop = 40;
-            // Margem do fundo
             const safetyMarginBottom = 40;
 
-            // Verificação de Limites (Zigzag forçado)
             if (f.verticalDir === -1 && nextY < horizonY + safetyMarginTop) {
-                // Se está subindo e vai passar do horizonte, força a descida imediatamente
                 f.verticalDir = 1;
                 f.zigzagTimer = 0;
             } else if (f.verticalDir === 1 && nextY > seaBottomY - safetyMarginBottom) {
-                 // Se está descendo muito, força a subida
                 f.verticalDir = -1;
                 f.zigzagTimer = 0;
             } else if (f.zigzagTimer > f.zigzagInterval) {
-                // Troca de direção normal por tempo
                 f.verticalDir *= -1;
                 f.zigzagTimer = 0;
             }
 
-            // Aplica o movimento vertical
             f.y += Math.abs(f.speedX) * f.verticalDir * f.verticalSpeedFactor;
-
-            // Adiciona o "tremido" lento (oscilação suave)
             f.y += Math.sin(t * 2 + f.x * 0.01) * 0.5;
 
-            // Verifica se saiu da tela pelas laterais
             if(f.x < -200 || f.x > w + 200) {
                 f.active = false;
             }
@@ -322,7 +301,6 @@
         function drawSurferTrail(ctx, f) {
             const trailSize = 25 * f.sizeScale; 
             f.trail.forEach((point, index) => {
-                // Opacidade diminui mais lentamente
                 const opacity = (index / f.trail.length) * 0.5; 
                 ctx.fillStyle = `rgba(220, 245, 255, ${opacity})`; 
                 ctx.fillRect(point.x + 10, point.y + 20, trailSize, trailSize * 0.6);
@@ -331,7 +309,6 @@
 
         function drawSurferSprite(ctx, f){ 
             ctx.font=`${Math.max(24,f.sizeScale*40)}px sans-serif`; 
-            // Sombra suave para destacar
             ctx.shadowColor = "rgba(0,80,150,0.2)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 5;
             ctx.fillText(f.sprite,f.x,f.y); 
             ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
@@ -351,18 +328,7 @@
             const [timerEmoji, setTimerEmoji] = React.useState("😃");
             const [errorDetails, setErrorDetails] = React.useState([]);
             
-            const [startTime, setStartTime] = React.useState(0);
-            const [finalScore, setFinalScore] = React.useState(0);
-            const [playerName, setPlayerName] = React.useState("");
-            const [highScore, setHighScore] = React.useState({ name: "Ainda Ninguém", score: 0 });
-
-            React.useEffect(() => {
-                const savedScore = localStorage.getItem('pokeHighScore');
-                if (savedScore) {
-                    setHighScore(JSON.parse(savedScore));
-                }
-            }, []);
-
+            // Timer
             React.useEffect(() => {
                 if (gameState !== "PLAYING") return;
                 if (timer > 12) setTimerEmoji("😃"); else if (timer > 7) setTimerEmoji("🤨"); else if (timer > 4) setTimerEmoji("😬"); else setTimerEmoji("😱");
@@ -371,6 +337,7 @@
                 return () => clearInterval(interval);
             }, [timer, gameState]);
 
+            // Opções da fase
             React.useEffect(() => {
                 if (gameState === "PLAYING" && selectedRecipe) {
                     const phaseKey = PHASES[currentPhaseIndex].key;
@@ -394,14 +361,12 @@
                 setCurrentSelections([]); 
                 setAllSelections({}); 
                 setTimer(20);
-                setStartTime(Date.now());
             };
 
             const resetToHome = () => {
                 setGameState("HOME");
                 setMenuCategory(null);
                 setSelectedRecipe(null);
-                setPlayerName("");
             };
 
             const handleSelection = (ingredient) => {
@@ -435,12 +400,6 @@
                     if (JSON.stringify(required) !== JSON.stringify(selected)) errors.push(`Erro em ${phase.title.replace(":", "")}. Era: ${required.join(", ")}`);
                 });
                 
-                if (errors.length === 0) {
-                    const durationSeconds = (Date.now() - startTime) / 1000;
-                    const score = Math.max(0, Math.round(1000 - (durationSeconds * 5)));
-                    setFinalScore(score);
-                }
-                
                 handleGameOver(errors.length === 0, errors);
             };
 
@@ -451,16 +410,6 @@
                 } else {
                     setErrorDetails(errors); setGameState("RESULT_FAIL"); playSound("sad");
                 }
-            };
-
-            const saveScore = () => {
-                if (!playerName.trim()) return;
-                if (finalScore > highScore.score) {
-                    const newRecord = { name: playerName, score: finalScore };
-                    setHighScore(newRecord);
-                    localStorage.setItem('pokeHighScore', JSON.stringify(newRecord));
-                }
-                resetToHome();
             };
 
             const getFullIngredientList = (key) => {
@@ -490,13 +439,7 @@
                         
                         {menuCategory === null ? (
                             <div className="flex flex-col gap-4 mt-4 md:mt-0 h-full justify-center md:justify-start">
-                                {/* SCORE BOARD */}
-                                <div className="bg-white/50 p-4 rounded-xl mb-4 border border-pastel-blue-300 shadow-sm text-center">
-                                    <p className="text-xs text-slate-500 uppercase tracking-wide font-bold">🏆 Recorde Atual</p>
-                                    <p className="text-pastel-blue-500 font-extrabold text-xl">{highScore.score} pts</p>
-                                    <p className="text-sm text-slate-700">{highScore.name}</p>
-                                </div>
-
+                                
                                 <button onClick={() => setMenuCategory("HOUSE")} className="bg-pastel-blue-400 text-white p-6 rounded-2xl shadow-lg hover:bg-pastel-blue-500 transition-all transform hover:scale-105 flex flex-col items-center">
                                     <span className="text-4xl mb-2">🐟</span>
                                     <span className="text-xl font-bold">House Bowls</span>
@@ -564,31 +507,15 @@
 
                         {gameState === "RESULT_SUCCESS" && (
                             <div className="text-center p-10 bg-pastel-blue-100/95 rounded-3xl shadow-2xl animate-bounce-in mx-4 border border-white/50 max-w-md w-full">
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-pastel-green mb-2 drop-shadow-sm">Perfeita! 🤩</h2>
-                                <p className="text-lg text-slate-600 mb-6">Sua pontuação final:</p>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-pastel-green mb-6 drop-shadow-sm flex items-center justify-center gap-2">
+                                    <IconCheck size={40} /> Perfeita!
+                                </h2>
                                 
-                                <div className="text-5xl font-black text-pastel-blue-500 mb-6 animate-pulse">{finalScore}</div>
+                                <p className="text-slate-600 mb-8 font-medium">Você montou a Bowl corretamente.</p>
 
-                                {finalScore > highScore.score && (
-                                    <div className="mb-4 bg-yellow-100 text-yellow-700 p-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2">
-                                        <IconTrophy size={20} className="text-yellow-600"/> NOVO RECORDE!
-                                    </div>
-                                )}
-
-                                <div className="flex flex-col gap-3">
-                                    <label className="text-sm font-bold text-slate-500 text-left">Digite seu nome para salvar:</label>
-                                    <input 
-                                        type="text" 
-                                        value={playerName} 
-                                        onChange={(e) => setPlayerName(e.target.value)}
-                                        placeholder="Seu Nome" 
-                                        className="p-3 rounded-lg border-2 border-pastel-blue-200 focus:border-pastel-blue-500 outline-none text-center font-bold text-lg"
-                                        maxLength={12}
-                                    />
-                                    <button onClick={saveScore} disabled={!playerName.trim()} className="mt-2 bg-pastel-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-pastel-blue-400 transition-all disabled:opacity-50 active:scale-95 flex items-center justify-center gap-2">
-                                        Gravar e Voltar
-                                    </button>
-                                </div>
+                                <button onClick={resetToHome} className="mt-4 bg-pastel-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-pastel-blue-400 transition-all active:scale-95 flex items-center justify-center gap-2 w-full">
+                                    <IconHome size={24}/> Voltar ao Início
+                                </button>
                             </div>
                         )}
 
@@ -614,7 +541,7 @@
                     </div>
                      {/* VERSION LABEL */}
        <div className="fixed bottom-1 right-2 text-xs text-slate-500/60 font-sans z-50 pointer-events-none select-none">
-           v1.16 BETA
+           v1.18 BETA
        </div>
                 </div>
             );
