@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poke House – Treino v2.05 BETA</title>
+    <title>Poke House – Treino v2.06 BETA</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -53,6 +53,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        /* Fundo base */
         body { margin: 0; overflow: hidden; background-color: #FFE6F2; touch-action: manipulation; }
         .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .custom-scroll::-webkit-scrollbar { width: 6px; }
@@ -83,7 +84,8 @@
 
         // --- HISTÓRICO DE VERSÕES ---
         const CHANGELOG = [
-            { version: "2.05", date: "Atual", changes: ["Menu de 'Versão' clicável com histórico de alterações."] },
+            { version: "2.06", date: "Atual", changes: ["Atualização da receita Vegetarian (Amêndoas e Sem Sésamo)."] },
+            { version: "2.05", date: "Anterior", changes: ["Menu de 'Versão' clicável com histórico de alterações."] },
             { version: "2.04", date: "Anterior", changes: ["Lógica do timer ajustada (emojis de tensão)", "Timer fica vermelho nos últimos 6 segundos."] },
             { version: "2.03", date: "Anterior", changes: ["Atualização receitas Smoothies (Modo E 2x)", "Inclusão Banana no 'Into the Sun'"] },
             { version: "2.01", date: "Anterior", changes: ["Criação da categoria SMOOTHIES", "Lógica separada para Bowls vs Smoothies", "Novos ingredientes e fases específicas"] },
@@ -113,7 +115,8 @@
         const RECIPES = [
             { id: 1, category: "HOUSE", name: "Sunny Salmon 🌞", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] },
             { id: 2, category: "HOUSE", name: "Spicy Tuna 🐟", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Pepino", "Cenoura"], protein: ["Atum", "Atum"], sauce_final: ["Ponzu", "Spicy Peanuts"], crispy: ["Cebola frita"], sesame: ["Sim"] },
-            { id: 3, category: "HOUSE", name: "Vegetarian 🌿", base: ["Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Tomate Cherry", "Pepino", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Batata Doce Crocante"], sesame: ["Sim"] },
+            // VEGETARIAN ATUALIZADO
+            { id: 3, category: "HOUSE", name: "Vegetarian 🌿", base: ["Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Tomate Cherry", "Pepino", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Amêndoa"], sesame: ["Não"] },
             { id: 4, category: "HOUSE", name: "Chicken 🐔", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Tomate Cherry", "Courgette"], protein: ["Frango Teriyaki", "Frango Teriyaki"], sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Amêndoa"], sesame: ["Sim"] },
             { id: 5, category: "HOUSE", name: "Fire Salmon 🔥", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Sriracha Mayo"], greens: ["Jalapeños", "Tomate Cherry", "Pepino"], protein: ["Salmão", "Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Cebola frita"], sesame: ["Sim"] },
             { id: 6, category: "HOUSE", name: "Mixed Seas 🌊", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] },
@@ -316,8 +319,7 @@
                 const phase = activePhases[currentPhaseIndex];
                 const requiredList = selectedRecipe[phase.key];
                 
-                // Correção para permitir clicar várias vezes no mesmo ingrediente se a receita pedir
-                // Mas aqui estamos apenas validando se o ingrediente clicado FAZ PARTE da lista, não a quantidade ainda.
+                // Validação simplificada: Apenas verifica se o ingrediente existe na lista da fase
                 const isCorrect = requiredList.includes(ingredient);
                 playSound(isCorrect ? "happy" : "sad");
 
@@ -346,7 +348,6 @@
                     if (JSON.stringify(required) !== JSON.stringify(selected)) errors.push(`Erro em ${phase.title.replace(":", "")}. Era: ${required.join(", ")}`);
                 });
                 
-                // Enviar evento para o Google Analytics se configurado
                 if (errors.length === 0 && window.gtag) {
                     window.gtag('event', 'bowl_concluida', {
                         'recipe_name': selectedRecipe.name,
@@ -503,7 +504,7 @@
                             onClick={() => setShowChangelog(true)}
                             className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none"
                         >
-                            v2.05 BETA
+                            v2.06 BETA
                         </button>
                     </div>
                     
