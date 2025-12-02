@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poke House – Treino v2.12 BETA</title>
+    <title>Poke House – Treino v3.01 BETA</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -98,25 +98,23 @@
 
         // --- HISTÓRICO DE VERSÕES ---
         const CHANGELOG = [
-            { version: "2.12", date: "Atual", changes: ["Inserção do 1° easter egg."] },
+            { version: "3.01", date: "Atual", changes: ["Implementação de tamanhos (Regular/Large) para House Bowls.", "Reformulação completa das fases e quantidades."] },
+            { version: "2.12", date: "Anterior", changes: ["Inserção do 1° easter egg."] },
             { version: "2.11", date: "Anterior", changes: ["Aumento do tamanho do logo na versão mobile."] },
             { version: "2.10", date: "Anterior", changes: ["Adição da 'bowl pulante' 🥗 na tela inicial do modo mobile."] },
             { version: "2.09", date: "Anterior", changes: ["Novas mensagens aleatórias de feedback (Sucesso e Erro)."] },
             { version: "2.08", date: "Anterior", changes: ["Atualização de UX: Mar e surfistas. Inserção de peixes.", "Correção do fundo rosa aparecendo no mar.", "Peixes aparecem por 2s e sobem sumindo."] },
-            { version: "2.06", date: "Anterior", changes: ["Atualização da receita Vegetarian (Amêndoas e Sem Sésamo)."] },
-            { version: "2.05", date: "Anterior", changes: ["Menu de 'Versão' clicável com histórico de alterações."] },
-            { version: "2.04", date: "Anterior", changes: ["Lógica do timer ajustada (emojis de tensão)", "Timer fica vermelho nos últimos 6 segundos."] },
             { version: "2.03", date: "Anterior", changes: ["Atualização receitas Smoothies (Modo E 2x)", "Inclusão Banana no 'Into the Sun'"] },
-            { version: "2.01", date: "Anterior", changes: ["Criação da categoria SMOOTHIES", "Lógica separada para Bowls vs Smoothies", "Novos ingredientes e fases específicas"] },
-            { version: "1.18", date: "Anterior", changes: ["Remoção do sistema de Pontuação e Nome", "Simplificação da tela de sucesso"] }
+            { version: "2.01", date: "Anterior", changes: ["Criação da categoria SMOOTHIES"] }
         ];
 
         // --- DADOS DO JOGO ---
         const INGREDIENTS_DB = {
+            sizes: ["Regular", "Large"],
             bases: ["Arroz de sushi", "Arroz preto", "Quinoa", "Arroz basmati", "Coconut Basmati", "Espinafres", "Winter Salad"],
             sauces_base: ["Azeite", "Azeite de Limão", "Vinagrete", "Ponzu", "Sriracha Mayo", "Não leva"],
             greens: ["Batata Doce com Alecrim", "Brócolis", "Pickle Cebola", "Beterraba", "Cenoura c/ Soja", "Milho", "Abacaxi", "Edamame", "Tomate Cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta", "Jalapeños", "Azeitonas", "Abacate", "Philadelphia", "Wakame", "Manga", "Hummus", "Hortelã (Fresca)"],
-            proteins: ["Salmão Braseado", "Filé de Salmão", "Frango Vietnamita", "Camarão Panado", "Frango", "Frango Teriyaki", "Camarão", "Juicy Salmon", "Juicy Tuna", "Salmão", "Atum", "Tofu Grelhado", "Ovo", "Não leva"],
+            proteins: ["Salmão Braseado", "Filé de Salmão", "Frango Vietnamita", "Camarão Panado", "Frango", "Frango Teriyaki", "Camarão", "Juicy Salmon", "Juicy Tuna", "Salmão", "Atum", "Tofu Grelhado", "Ovo", "Não leva", "Wakame"], // Wakame adicionado aqui também para o Spicy Tuna
             sauces_final: ["Creamy Caesar", "Creme de Abacate", "Spicy Peanuts", "Mel", "Chipotle", "Sésamo Shoyu", "Sriracha Mayo", "Wasabi Mayo", "Azeite", "Azeite de Limão", "Manjericão e Hortelã", "Vinagrete", "Soja", "Teriyaki", "Ponzu", "Especial"],
             crispies: ["Cebola frita", "Ervilhas Wasabi", "Algas Nori", "Amêndoa", "Batata Doce", "Lima", "Bacon", "Croutons", "Batata Doce Crocante", "Não leva", "Cebola Crocante"],
             sesame: ["Sim", "Não"],
@@ -127,32 +125,99 @@
             smoothie_mode: ["Modo A", "Modo B", "Modo C", "Modo D", "Modo E", "Modo F"]
         };
 
+        // ESTRUTURA NOVA DE RECEITAS COM VARIANTES
         const RECIPES = [
-            { id: 1, category: "HOUSE", name: "Sunny Salmon 🌞", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] },
-            { id: 2, category: "HOUSE", name: "Spicy Tuna 🐟", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Pepino", "Cenoura"], protein: ["Atum", "Atum"], sauce_final: ["Ponzu", "Spicy Peanuts"], crispy: ["Cebola frita"], sesame: ["Sim"] },
-            { id: 3, category: "HOUSE", name: "Vegetarian 🌿", base: ["Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Tomate Cherry", "Pepino", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Amêndoa"], sesame: ["Não"] },
-            { id: 4, category: "HOUSE", name: "Chicken 🐔", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Tomate Cherry", "Courgette"], protein: ["Frango Teriyaki", "Frango Teriyaki"], sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Amêndoa"], sesame: ["Sim"] },
-            { id: 5, category: "HOUSE", name: "Fire Salmon 🔥", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Sriracha Mayo"], greens: ["Jalapeños", "Tomate Cherry", "Pepino"], protein: ["Salmão", "Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Cebola frita"], sesame: ["Sim"] },
-            { id: 6, category: "HOUSE", name: "Mixed Seas 🌊", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] },
-            { id: 7, category: "HOUSE", name: "Crispy Shrimp 🦐", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino"], protein: Array(8).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] },
-            { id: 8, category: "HOUSE", name: "Salmon Sushi 🍣", base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] },
-            { id: 9, category: "GREEN", name: "The Caesar 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Tomate Cherry", "Tomate Cherry", "Grana Padano"], protein: ["Frango", "Frango", "Frango"], sauce_final: ["Creamy Caesar"], crispy: ["Bacon", "Croutons", "Lima"], sesame: ["Não"] },
-            { id: 10, category: "GREEN", name: "Exotic Salmon 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] },
-            { id: 11, category: "GREEN", name: "Velvet Garden 🥗", base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] },
-            { id: 12, category: "GREEN", name: "Cozy Chicken 🥗", base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Não"] },
+            // --- HOUSE BOWLS (Com Regular e Large) ---
+            { 
+                id: 1, category: "HOUSE", name: "Sunny Salmon 🌞", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Couve roxa", "Edamame", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 2, category: "HOUSE", name: "Spicy Tuna 🐟", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Pepino", "Cenoura"], protein: ["Atum", "Atum", "Wakame"], sauce_final: ["Ponzu", "Spicy Peanuts"], crispy: ["Cebola frita"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Couve roxa", "Pepino", "Pepino", "Cenoura"], protein: ["Atum", "Atum", "Atum", "Wakame"], sauce_final: ["Ponzu", "Spicy Peanuts"], crispy: ["Cebola frita"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 3, category: "HOUSE", name: "Vegetarian 🌿", 
+                variants: {
+                    "Regular": { base: ["Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Tomate Cherry", "Pepino", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Amêndoa"], sesame: ["Não"] },
+                    "Large":   { base: ["Arroz basmati", "Arroz basmati", "Arroz basmati"], sauce_base: ["Não leva"], greens: ["Abacate", "Hummus", "Hummus", "Hummus", "Tomate Cherry", "Pepino", "Azeitonas", "Azeitonas"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Amêndoa"], sesame: ["Não"] }
+                }
+            },
+            { 
+                id: 4, category: "HOUSE", name: "Chicken 🐔", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Tomate Cherry", "Courgette"], protein: ["Frango Teriyaki", "Frango Teriyaki"], sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Amêndoa"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Couve roxa", "Couve roxa", "Tomate Cherry", "Courgette", "Courgette"], protein: ["Frango Teriyaki", "Frango Teriyaki", "Frango Teriyaki"], sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Amêndoa"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 5, category: "HOUSE", name: "Fire Salmon 🔥", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Sriracha Mayo"], greens: ["Jalapeños", "Tomate Cherry", "Pepino"], protein: ["Salmão", "Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Cebola frita"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Sriracha Mayo"], greens: ["Jalapeños", "Tomate Cherry", "Pepino", "Pepino"], protein: ["Salmão", "Salmão", "Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Cebola frita"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 6, category: "HOUSE", name: "Mixed Seas 🌊", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 7, category: "HOUSE", name: "Crispy Shrimp 🦐", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino"], protein: Array(8).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino", "Pepino"], protein: Array(12).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] }
+                }
+            },
+            { 
+                id: 8, category: "HOUSE", name: "Salmon Sushi 🍣", 
+                variants: {
+                    "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] },
+                    "Large":   { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] }
+                }
+            },
+
+            // --- GREEN BOWLS (Apenas uma variante Regular por padrão) ---
+            { 
+                id: 9, category: "GREEN", name: "The Caesar 🥗", 
+                variants: { "Regular": { base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Tomate Cherry", "Tomate Cherry", "Grana Padano"], protein: ["Frango", "Frango", "Frango"], sauce_final: ["Creamy Caesar"], crispy: ["Bacon", "Croutons", "Lima"], sesame: ["Não"] } }
+            },
+            { 
+                id: 10, category: "GREEN", name: "Exotic Salmon 🥗", 
+                variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] } }
+            },
+            { 
+                id: 11, category: "GREEN", name: "Velvet Garden 🥗", 
+                variants: { "Regular": { base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] } }
+            },
+            { 
+                id: 12, category: "GREEN", name: "Cozy Chicken 🥗", 
+                variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Não"] } }
+            },
+
+            // --- SMOOTHIES (Lógica Separada) ---
             { id: 13, category: "SMOOTHIE", name: "Into the Sun 💛", smoothie_liquid: ["Leite de Coco"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Manga 40g", "Manga 40g", "Ananás 30g", "Ananás 30g", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
             { id: 14, category: "SMOOTHIE", name: "Sweet Pink 🩷", smoothie_liquid: ["Leite"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Morango", "Morango", "Morango", "Morango", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
             { id: 15, category: "SMOOTHIE", name: "So Green 💚", smoothie_liquid: ["Suco de Maçã"], smoothie_amount: ["250ml"], smoothie_ingredients: ["Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] }
         ];
 
         const PHASES_BOWL = [
-            { key: "base", title: "1️⃣ – Base:", hint: "Escolha as bases." },
-            { key: "sauce_base", title: "2️⃣ – Molho da base:", hint: "Escolha o molho." },
-            { key: "greens", title: "3️⃣ – Greens:", hint: "Escolha os greens." },
-            { key: "protein", title: "4️⃣ – Proteína:", hint: "Escolha as proteínas." },
-            { key: "sauce_final", title: "5️⃣ – Molho final:", hint: "Escolha os molhos." },
-            { key: "crispy", title: "6️⃣ – Crispy:", hint: "Escolha UM crispy." }, 
-            { key: "sesame", title: "7️⃣ – Sésamo:", hint: "Essa Bowl leva sésamo?" },
+            { key: "size", title: "1️⃣ – Tamanho:", hint: "Qual o tamanho da bowl?" },
+            { key: "base", title: "2️⃣ – Base:", hint: "Escolha as bases." },
+            { key: "sauce_base", title: "3️⃣ – Molho da base:", hint: "Escolha o molho." },
+            { key: "greens", title: "4️⃣ – Greens:", hint: "Escolha os greens." },
+            { key: "protein", title: "5️⃣ – Proteína:", hint: "Escolha as proteínas." },
+            { key: "sauce_final", title: "6️⃣ – Molho final:", hint: "Escolha os molhos." },
+            { key: "crispy", title: "7️⃣ – Crispy:", hint: "Escolha UM crispy." }, 
+            { key: "sesame", title: "8️⃣ – Sésamo:", hint: "Essa Bowl leva sésamo?" },
         ];
 
         const PHASES_SMOOTHIE = [
@@ -190,139 +255,47 @@
 
         // --- EASTER EGG (FOOD RAIN) ---
         const EASTER_EGG_EMOJIS = ['🥑','🍅','🫛','🥕','🫒','🌽','🧅','🥦','🍓','🥭','🍍','🍣','🍤','🍪','🥗','🧀','🥚','🥔'];
-        
         const FoodRain = ({ active, trigger }) => {
             const canvasRef = React.useRef(null);
-            const [particles, setParticles] = React.useState([]);
-
-            // Adiciona novas partículas quando o trigger muda
-            React.useEffect(() => {
-                if (!trigger || trigger === 0) return;
-                
-                const canvas = canvasRef.current;
-                if (!canvas) return;
-                
-                const newParticles = [];
-                // Cria 8-12 comidas por clique
-                const count = 8 + Math.floor(Math.random() * 5); 
-                
-                for (let i = 0; i < count; i++) {
-                    // Chão aleatório nos últimos 10% da tela
-                    const floorY = canvas.height - (Math.random() * (canvas.height * 0.1));
-                    
-                    newParticles.push({
-                        x: canvas.width / 2, // Nasce no centro (onde está a bowl)
-                        y: canvas.height * 0.4, // Altura aproximada da bowl no mobile
-                        vx: (Math.random() - 0.5) * 25, // Velocidade horizontal frenética
-                        vy: (Math.random() - 0.5) * 25, // Velocidade vertical frenética
-                        gravity: 0.5,
-                        friction: 0.99, // Ar
-                        elasticity: 0.8, // Quica muito
-                        emoji: EASTER_EGG_EMOJIS[Math.floor(Math.random() * EASTER_EGG_EMOJIS.length)],
-                        size: 30 + Math.random() * 20,
-                        floorY: floorY,
-                        life: 1.0, // Opacidade
-                        settled: false
-                    });
-                }
-                
-                setParticles(prev => [...prev, ...newParticles]);
-            }, [trigger]);
-
-            // Loop de animação
-            React.useEffect(() => {
-                const canvas = canvasRef.current;
-                if (!canvas) return;
-                const ctx = canvas.getContext("2d");
-                
-                const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-                window.addEventListener("resize", resize); resize();
-
-                let animationId;
-
-                const loop = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Atualiza e desenha partículas
-                    // Usamos uma referência mutável para o estado dentro do loop seria complexo com React puro, 
-                    // então vamos usar uma abordagem simplificada onde manipulamos o array localmente e atualizamos o estado menos frequentemente ou usamos ref.
-                    // Para simplificar neste código único, vamos usar um truque: 
-                    // O loop roda baseado no estado 'particles'. Mas 'particles' é const no closure.
-                    // Precisamos de um ref para as particulas para animar performaticamente.
-                };
-                
-                // Hack para animar com React state em canvas sem lag:
-                // Na verdade, para um easter egg rápido, vamos fazer a lógica dentro do requestAnimationFrame
-                // usando uma ref para guardar as partículas vivas.
-                
-                return () => { window.removeEventListener("resize", resize); cancelAnimationFrame(animationId); };
-            }, []);
-            
-            // Re-implementação correta com Ref para performance
             const particlesRef = React.useRef([]);
             
-            // Sincroniza o ref com o estado quando adicionamos (apenas para adicionar)
             React.useEffect(() => {
-                if (particles.length > 0) {
-                    particlesRef.current = [...particlesRef.current, ...particles];
-                    setParticles([]); // Limpa o estado para não re-adicionar
+                if (!trigger || trigger === 0) return;
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const newParticles = [];
+                const count = 8 + Math.floor(Math.random() * 5); 
+                for (let i = 0; i < count; i++) {
+                    const floorY = canvas.height - (Math.random() * (canvas.height * 0.1));
+                    newParticles.push({ x: canvas.width / 2, y: canvas.height * 0.4, vx: (Math.random() - 0.5) * 25, vy: (Math.random() - 0.5) * 25, gravity: 0.5, friction: 0.99, elasticity: 0.8, emoji: EASTER_EGG_EMOJIS[Math.floor(Math.random() * EASTER_EGG_EMOJIS.length)], size: 30 + Math.random() * 20, floorY: floorY, life: 1.0, settled: false });
                 }
-            }, [particles]);
+                particlesRef.current = [...particlesRef.current, ...newParticles];
+            }, [trigger]);
 
             React.useEffect(() => {
                 const canvas = canvasRef.current;
                 const ctx = canvas.getContext("2d");
+                const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                window.addEventListener("resize", resize); resize();
                 let animId;
-
                 const render = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Filtra partículas mortas (life <= 0)
                     particlesRef.current = particlesRef.current.filter(p => p.life > 0);
-
                     particlesRef.current.forEach(p => {
                         if (!p.settled) {
-                            p.vy += p.gravity;
-                            p.x += p.vx;
-                            p.y += p.vy;
-
-                            // Colisão Paredes
-                            if (p.x < 0 || p.x > canvas.width) {
-                                p.vx *= -1;
-                                p.x = p.x < 0 ? 0 : canvas.width;
-                            }
-
-                            // Colisão Chão (Acumular)
-                            if (p.y > p.floorY) {
-                                p.y = p.floorY;
-                                p.vy *= -p.elasticity;
-                                p.vx *= 0.9; // Atrito no chão
-                                
-                                // Se a velocidade for muito baixa, para
-                                if (Math.abs(p.vy) < 1 && Math.abs(p.vx) < 1) {
-                                    p.settled = true;
-                                }
-                            }
-                        } else {
-                            // Se está parado, começa a sumir
-                            p.life -= 0.01;
-                        }
-
-                        ctx.globalAlpha = p.life;
-                        ctx.font = `${p.size}px sans-serif`;
-                        ctx.fillText(p.emoji, p.x, p.y);
-                        ctx.globalAlpha = 1.0;
+                            p.vy += p.gravity; p.x += p.vx; p.y += p.vy;
+                            if (p.x < 0 || p.x > canvas.width) { p.vx *= -1; p.x = p.x < 0 ? 0 : canvas.width; }
+                            if (p.y > p.floorY) { p.y = p.floorY; p.vy *= -p.elasticity; p.vx *= 0.9; if (Math.abs(p.vy) < 1 && Math.abs(p.vx) < 1) p.settled = true; }
+                        } else { p.life -= 0.01; }
+                        ctx.globalAlpha = p.life; ctx.font = `${p.size}px sans-serif`; ctx.fillText(p.emoji, p.x, p.y); ctx.globalAlpha = 1.0;
                     });
-
                     animId = requestAnimationFrame(render);
                 };
                 render();
-                return () => cancelAnimationFrame(animId);
+                return () => { window.removeEventListener("resize", resize); cancelAnimationFrame(animId); };
             }, []);
-
             return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-50" />;
         };
-
 
         // --- FUNDO (OCEAN) ---
         const OceanBackground = ({ active }) => {
@@ -379,6 +352,7 @@
             const [gameState, setGameState] = React.useState("HOME");
             const [menuCategory, setMenuCategory] = React.useState(null); 
             const [selectedRecipe, setSelectedRecipe] = React.useState(null);
+            const [selectedSize, setSelectedSize] = React.useState(null); // NOVO STATE PARA TAMANHO
             const [currentPhaseIndex, setCurrentPhaseIndex] = React.useState(0);
             const [currentSelections, setCurrentSelections] = React.useState([]);
             const [allSelections, setAllSelections] = React.useState({});
@@ -389,15 +363,8 @@
             const [showChangelog, setShowChangelog] = React.useState(false);
             const [resultMessage, setResultMessage] = React.useState("");
             
-            // EASTER EGG STATE
             const [easterEggTrigger, setEasterEggTrigger] = React.useState(0);
-
-            const handleEasterEggClick = () => {
-                // Só ativa se for mobile (telas pequenas) e estiver na vertical (altura > largura)
-                if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-                    setEasterEggTrigger(prev => prev + 1);
-                }
-            };
+            const handleEasterEggClick = () => { if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) { setEasterEggTrigger(prev => prev + 1); } };
 
             const getCurrentPhases = () => {
                 if (selectedRecipe?.category === "SMOOTHIE") return PHASES_SMOOTHIE;
@@ -416,8 +383,31 @@
                 if (gameState === "PLAYING" && selectedRecipe) {
                     const activePhases = getCurrentPhases();
                     const phaseKey = activePhases[currentPhaseIndex].key;
-                    const fullList = getFullIngredientList(phaseKey);
-                    const requiredIngs = selectedRecipe[phaseKey];
+                    
+                    // LÓGICA DE FASE: TAMANHO
+                    if (phaseKey === "size") {
+                        setPhaseOptions(INGREDIENTS_DB.sizes); // "Regular", "Large"
+                        return;
+                    }
+
+                    // Se não for fase de tamanho, pega a lista normal
+                    let fullList = getFullIngredientList(phaseKey);
+                    
+                    // LÓGICA PARA PEGAR A VARIAÇÃO CORRETA DA RECEITA
+                    let requiredIngs = [];
+                    if (selectedRecipe.category === "SMOOTHIE") {
+                        requiredIngs = selectedRecipe[phaseKey];
+                    } else {
+                        // Se for Bowl, depende do tamanho escolhido
+                        // Green bowls só tem "Regular", então usamos "Regular" como fallback
+                        const sizeToUse = selectedSize || "Regular";
+                        if (selectedRecipe.variants && selectedRecipe.variants[sizeToUse]) {
+                            requiredIngs = selectedRecipe.variants[sizeToUse][phaseKey];
+                        } else {
+                            requiredIngs = []; // Fallback seguro
+                        }
+                    }
+
                     const requiredSet = new Set(requiredIngs);
                     const requiredUnique = [...requiredSet];
                     const distractors = fullList.filter(ing => !requiredSet.has(ing));
@@ -427,27 +417,68 @@
                     const finalOptions = shuffleArray([...requiredUnique, ...selectedDistractors]);
                     setPhaseOptions(finalOptions);
                 }
-            }, [currentPhaseIndex, gameState, selectedRecipe]);
+            }, [currentPhaseIndex, gameState, selectedRecipe, selectedSize]);
 
             const startGame = (recipe) => {
-                setSelectedRecipe(recipe); setGameState("PLAYING"); setCurrentPhaseIndex(0); setCurrentSelections([]); setAllSelections({}); setTimer(20);
+                setSelectedRecipe(recipe); 
+                setGameState("PLAYING"); 
+                
+                // Configuração inicial de fases
+                if (recipe.category === "GREEN") {
+                    // Green bowls pulam a escolha de tamanho (assumem Regular)
+                    setSelectedSize("Regular");
+                    setCurrentPhaseIndex(1); // Pula fase 0 (Size)
+                } else if (recipe.category === "SMOOTHIE") {
+                    setSelectedSize(null); // Smoothies não usam tamanho na logica atual
+                    setCurrentPhaseIndex(0);
+                } else {
+                    // House bowls começam na fase 0 (Escolha de Tamanho)
+                    setSelectedSize(null);
+                    setCurrentPhaseIndex(0); 
+                }
+                
+                setCurrentSelections([]); 
+                setAllSelections({}); 
+                setTimer(20);
             };
 
             const resetToHome = () => {
-                setGameState("HOME"); setMenuCategory(null); setSelectedRecipe(null);
+                setGameState("HOME"); setMenuCategory(null); setSelectedRecipe(null); setSelectedSize(null);
             };
 
             const handleSelection = (ingredient) => {
-                setTimer(20);
                 const activePhases = getCurrentPhases();
-                const phase = activePhases[currentPhaseIndex];
-                const requiredList = selectedRecipe[phase.key];
+                const phaseKey = activePhases[currentPhaseIndex].key;
+
+                // --- LÓGICA ESPECIAL: SELEÇÃO DE TAMANHO ---
+                if (phaseKey === "size") {
+                    setSelectedSize(ingredient);
+                    // Avança imediatamente para a próxima fase
+                    setCurrentPhaseIndex(prev => prev + 1);
+                    setTimer(20); // Reseta timer
+                    return;
+                }
+
+                // --- LÓGICA NORMAL DE INGREDIENTES ---
+                setTimer(20);
+                
+                // Determina a lista correta de ingredientes baseada no tamanho
+                let requiredList = [];
+                if (selectedRecipe.category === "SMOOTHIE") {
+                    requiredList = selectedRecipe[phaseKey];
+                } else {
+                    const sizeToUse = selectedSize || "Regular";
+                    requiredList = selectedRecipe.variants[sizeToUse][phaseKey];
+                }
+
                 const isCorrect = requiredList.includes(ingredient);
                 playSound(isCorrect ? "happy" : "sad");
+                
                 const newSelections = [...currentSelections, ingredient];
                 setCurrentSelections(newSelections);
-                if (newSelections.length === selectedRecipe[phase.key].length) {
-                    const updatedAll = { ...allSelections, [phase.key]: newSelections };
+
+                if (newSelections.length === requiredList.length) {
+                    const updatedAll = { ...allSelections, [phaseKey]: newSelections };
                     setAllSelections(updatedAll);
                     if (currentPhaseIndex < activePhases.length - 1) {
                         setTimeout(() => { setCurrentPhaseIndex(prev => prev + 1); setCurrentSelections([]); setTimer(20); }, 300);
@@ -462,10 +493,25 @@
             const validateGame = (finalSelections) => {
                 let errors = [];
                 const activePhases = getCurrentPhases();
-                activePhases.forEach(phase => {
-                    const required = [...selectedRecipe[phase.key]].sort();
-                    const selected = [...finalSelections[phase.key]].sort();
-                    if (JSON.stringify(required) !== JSON.stringify(selected)) errors.push(`Erro em ${phase.title.replace(":", "")}. Era: ${required.join(", ")}`);
+                
+                // Começa a validação ignorando a fase "size" se ela existir
+                const phasesToValidate = activePhases.filter(p => p.key !== "size");
+
+                phasesToValidate.forEach(phase => {
+                    let required = [];
+                    if (selectedRecipe.category === "SMOOTHIE") {
+                        required = selectedRecipe[phase.key];
+                    } else {
+                        const sizeToUse = selectedSize || "Regular";
+                        required = selectedRecipe.variants[sizeToUse][phase.key];
+                    }
+                    
+                    const requiredSorted = [...required].sort();
+                    const selectedSorted = [...finalSelections[phase.key]].sort();
+                    
+                    if (JSON.stringify(requiredSorted) !== JSON.stringify(selectedSorted)) {
+                        errors.push(`Erro em ${phase.title.replace(":", "")}. Era: ${requiredSorted.join(", ")}`);
+                    }
                 });
                 if (errors.length === 0 && window.gtag) { window.gtag('event', 'bowl_concluida', { 'recipe_name': selectedRecipe.name, 'category': selectedRecipe.category }); }
                 handleGameOver(errors.length === 0, errors);
@@ -481,11 +527,38 @@
 
             const getFullIngredientList = (key) => {
                  switch(key) {
-                    case 'base': return INGREDIENTS_DB.bases; case 'sauce_base': return INGREDIENTS_DB.sauces_base; case 'greens': return INGREDIENTS_DB.greens; case 'protein': return INGREDIENTS_DB.proteins; case 'sauce_final': return INGREDIENTS_DB.sauces_final; case 'crispy': return INGREDIENTS_DB.crispies; case 'sesame': return INGREDIENTS_DB.sesame; case 'smoothie_liquid': return INGREDIENTS_DB.smoothie_liquid; case 'smoothie_amount': return INGREDIENTS_DB.smoothie_amount; case 'smoothie_ingredients': return INGREDIENTS_DB.smoothie_ingredients; case 'smoothie_ice': return INGREDIENTS_DB.smoothie_ice; case 'smoothie_mode': return INGREDIENTS_DB.smoothie_mode; default: return [];
+                    case 'base': return INGREDIENTS_DB.bases;
+                    case 'sauce_base': return INGREDIENTS_DB.sauces_base;
+                    case 'greens': return INGREDIENTS_DB.greens;
+                    case 'protein': return INGREDIENTS_DB.proteins;
+                    case 'sauce_final': return INGREDIENTS_DB.sauces_final;
+                    case 'crispy': return INGREDIENTS_DB.crispies;
+                    case 'sesame': return INGREDIENTS_DB.sesame;
+                    case 'smoothie_liquid': return INGREDIENTS_DB.smoothie_liquid;
+                    case 'smoothie_amount': return INGREDIENTS_DB.smoothie_amount;
+                    case 'smoothie_ingredients': return INGREDIENTS_DB.smoothie_ingredients;
+                    case 'smoothie_ice': return INGREDIENTS_DB.smoothie_ice;
+                    case 'smoothie_mode': return INGREDIENTS_DB.smoothie_mode;
+                    default: return [];
                 }
             };
 
             const getCurrentPhaseData = () => { if(!selectedRecipe) return {}; const phases = getCurrentPhases(); return phases[currentPhaseIndex]; };
+            
+            // Helper para saber quantos faltam
+            const getSelectionLimit = () => {
+                if (!selectedRecipe) return 0;
+                const phaseKey = getCurrentPhases()[currentPhaseIndex].key;
+                if (phaseKey === "size") return 1;
+                
+                if (selectedRecipe.category === "SMOOTHIE") {
+                    return selectedRecipe[phaseKey].length;
+                } else {
+                    const sizeToUse = selectedSize || "Regular";
+                    // Proteção contra undefined se a variante não existir (ex: Green Bowl em fase que não deveria)
+                    return selectedRecipe.variants[sizeToUse] ? selectedRecipe.variants[sizeToUse][phaseKey].length : 0;
+                }
+            };
 
             return (
                 <div className="fixed inset-0 w-full h-full font-sans text-slate-800 flex flex-col md:flex-row overflow-hidden">
@@ -497,18 +570,7 @@
                         <div className="mb-6 text-center md:text-left flex justify-center md:justify-start">
                             <img src="https://storage.googleapis.com/ikona-bucket-production/images/5db193be3ea71a0001bb09f7/EXTENDED%20VERSION_original%20colors-617ac363073e550017b9966b.png" alt="Poke House Logo" className="w-4/5 md:w-auto md:h-16 object-contain" />
                         </div>
-                        
-                        {/* BOWL PULANTE NO MOBILE - BOTÃO EASTER EGG */}
-                        {gameState === "HOME" && menuCategory === null && (
-                            <div 
-                                onClick={handleEasterEggClick}
-                                className="md:hidden text-6xl animate-bounce text-center mb-6 cursor-pointer select-none active:scale-95 transition-transform"
-                                style={{ zIndex: 60 }} // Garante que fique acima do canvas de comida
-                            >
-                                🥗
-                            </div>
-                        )}
-
+                        {gameState === "HOME" && menuCategory === null && ( <div onClick={handleEasterEggClick} className="md:hidden text-6xl animate-bounce text-center mb-6 cursor-pointer select-none active:scale-95 transition-transform" style={{ zIndex: 60 }}>🥗</div> )}
                         {menuCategory === null ? (
                             <div className="flex flex-col gap-4 mt-4 md:mt-0 h-full justify-center md:justify-start">
                                 <button onClick={() => setMenuCategory("HOUSE")} className="bg-pastel-blue-400 text-white p-6 rounded-2xl shadow-lg hover:bg-pastel-blue-500 transition-all transform hover:scale-105 flex flex-col items-center"><span className="text-4xl mb-2">🐟</span> <span className="text-xl font-bold">House Bowls</span></button>
@@ -530,9 +592,9 @@
                     <div className={`flex-1 relative z-10 flex flex-col items-center justify-center p-2 md:p-6 ${gameState === "HOME" ? "hidden md:flex" : "flex h-full"}`}>
                         {gameState === "PLAYING" && (
                             <div className="w-full h-full md:h-auto md:max-h-[90vh] max-w-5xl bg-pastel-blue-100/85 backdrop-blur-md rounded-xl md:rounded-3xl shadow-xl border border-pastel-blue-200/50 animate-fade-in flex flex-col overflow-hidden">
-                                <div className="p-2 bg-pastel-blue-200/50 text-center text-pastel-blue-500 font-semibold text-sm md:text-base border-b border-pastel-blue-200/50 shrink-0">Receita Atual: <span className="font-bold">{selectedRecipe.name}</span></div>
+                                <div className="p-2 bg-pastel-blue-200/50 text-center text-pastel-blue-500 font-semibold text-sm md:text-base border-b border-pastel-blue-200/50 shrink-0">Receita Atual: <span className="font-bold">{selectedRecipe.name} {selectedSize ? `(${selectedSize})` : ""}</span></div>
                                 <div className="flex justify-between items-center p-4 border-b border-pastel-blue-200/50 bg-pastel-blue-100/40 shrink-0">
-                                    <div><h2 className="text-xl md:text-3xl font-bold text-pastel-blue-500">{getCurrentPhaseData().title}</h2><p className="text-xs md:text-base text-slate-600">{selectedRecipe[getCurrentPhaseData().key].length > 1 ? `Escolha ${selectedRecipe[getCurrentPhaseData().key].length} opções.` : getCurrentPhaseData().hint}</p><div className="text-xs md:text-sm mt-1 font-bold text-pastel-blue-400">Selecionado: {currentSelections.length} / {selectedRecipe[getCurrentPhaseData().key].length}</div></div>
+                                    <div><h2 className="text-xl md:text-3xl font-bold text-pastel-blue-500">{getCurrentPhaseData().title}</h2><p className="text-xs md:text-base text-slate-600">{getSelectionLimit() > 1 ? `Escolha ${getSelectionLimit()} opções.` : getCurrentPhaseData().hint}</p><div className="text-xs md:text-sm mt-1 font-bold text-pastel-blue-400">Selecionado: {currentSelections.length} / {getSelectionLimit()}</div></div>
                                     <div className="flex flex-col items-center min-w-[60px]"><span className="text-3xl md:text-4xl">{timerEmoji}</span><span className={`text-xl md:text-2xl font-bold ${timer <= 6 ? 'text-red-500' : 'text-pastel-blue-500'}`}>{timer}s</span></div>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 md:p-6 custom-scroll min-h-0 flex items-center justify-center">
@@ -571,9 +633,8 @@
                         )}
                     </div>
                     
-                    {/* BOTÃO DE VERSÃO & MODAL */}
                     <div className="fixed bottom-1 right-2 z-50">
-                        <button onClick={() => setShowChangelog(true)} className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none">v2.12 BETA</button>
+                        <button onClick={() => setShowChangelog(true)} className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none">v3.01 BETA</button>
                     </div>
                     
                     {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
