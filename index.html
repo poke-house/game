@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poke House – Treino v2.10 BETA</title>
+    <title>Poke House – Treino v2.11 BETA</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -98,7 +98,8 @@
 
         // --- HISTÓRICO DE VERSÕES ---
         const CHANGELOG = [
-            { version: "2.10", date: "Atual", changes: ["Adição da 'bowl pulante' 🥗 na tela inicial do modo mobile."] },
+            { version: "2.11", date: "Atual", changes: ["Aumento do tamanho do logo na versão mobile."] },
+            { version: "2.10", date: "Anterior", changes: ["Adição da 'bowl pulante' 🥗 na tela inicial do modo mobile."] },
             { version: "2.09", date: "Anterior", changes: ["Novas mensagens aleatórias de feedback (Sucesso e Erro)."] },
             { version: "2.08", date: "Anterior", changes: ["Atualização de UX: Mar e surfistas. Inserção de peixes.", "Correção do fundo rosa aparecendo no mar.", "Peixes aparecem por 2s e sobem sumindo."] },
             { version: "2.06", date: "Anterior", changes: ["Atualização da receita Vegetarian (Amêndoas e Sem Sésamo)."] },
@@ -454,7 +455,8 @@
                     {/* MENU LATERAL */}
                     <div className={`p-4 md:w-1/4 flex flex-col gap-2 transition-all duration-500 z-10 bg-pastel-blue-100/80 backdrop-blur-md border-r border-pastel-blue-200/40 shadow-lg ${gameState === "HOME" ? "w-full h-full overflow-y-auto" : "hidden md:flex h-full overflow-y-auto"}`}>
                         <div className="mb-6 text-center md:text-left flex justify-center md:justify-start">
-                            <img src="https://storage.googleapis.com/ikona-bucket-production/images/5db193be3ea71a0001bb09f7/EXTENDED%20VERSION_original%20colors-617ac363073e550017b9966b.png" alt="Poke House Logo" className="h-12 md:h-16 object-contain" />
+                            {/* LOGO COM TAMANHO AUMENTADO NO MOBILE (w-4/5) */}
+                            <img src="https://storage.googleapis.com/ikona-bucket-production/images/5db193be3ea71a0001bb09f7/EXTENDED%20VERSION_original%20colors-617ac363073e550017b9966b.png" alt="Poke House Logo" className="w-4/5 md:w-auto md:h-16 object-contain" />
                         </div>
                         
                         {/* BOWL PULANTE NO MOBILE */}
@@ -572,7 +574,7 @@
                             onClick={() => setShowChangelog(true)}
                             className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none"
                         >
-                            v2.10 BETA
+                            v2.11 BETA
                         </button>
                     </div>
                     
