@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poke House – Treino v4.02 BETA</title>
+    <title>Poke House – Treino v4.03 BETA</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -59,13 +59,12 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        /* Fundo base */
         body { margin: 0; overflow: hidden; background-color: #FFE6F2; touch-action: manipulation; }
         .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #A0C4FF; border-radius: 4px; }
-        .typing-cursor::after { content: '|'; animation: blink 1s step-start infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
@@ -88,12 +87,12 @@
         const FINAL_CUSTOM_PHRASES = ["Uau! Ficou linda sua bowl!", "Bom apetite!", "Prontinho! Experimente um dos nosso sumos naturais.", "Seu rosto é famíliar, já é nosso cliente né?", "Muito obrigado, volte mais vezes!"];
 
         const CHANGELOG = [
-            { version: "4.02", date: "Atual", changes: ["Correção: Restauração da lista completa de receitas (House, Green, Smoothies)."] },
+            { version: "4.03", date: "Atual", changes: ["Correção: Texto 'comendo letras' removido.", "Botão Voltar/Desfazer agora remove o último ingrediente selecionado antes de voltar a fase.", "Botões de tamanho padronizados (REGULAR/LARGE).", "Adicionado molho 'Soja e Sésamo'.", "Removido 'Hortelã Fresca' dos Greens."] },
+            { version: "4.02", date: "Anterior", changes: ["Correção: Restauração da lista completa de receitas (House, Green, Smoothies)."] },
             { version: "4.01", date: "Anterior", changes: ["Correção crítica: Botões de tamanho no modo 'Crie sua bowl' corrigidos."] },
-            { version: "4.0", date: "Anterior", changes: ["Novo Modo: 'Crie sua própria bowl' (Roleplay).", "Sistema de Persona."] },
+            { version: "4.0", date: "Anterior", changes: ["Novo Modo: 'Crie sua própria bowl' (Roleplay de Cliente).", "Sistema de Persona."] },
             { version: "3.05", date: "Anterior", changes: ["Correção de bug visual nos easter eggs."] },
             { version: "3.04", date: "Anterior", changes: ["Easter Egg nº 2 (Desktop): 'Live Pink!'."] },
-            { version: "3.03", date: "Anterior", changes: ["Ajuste no Easter Egg nº 1."] },
             { version: "3.01", date: "Anterior", changes: ["Implementação de tamanhos (Regular/Large)."] }
         ];
 
@@ -101,9 +100,9 @@
             sizes: ["Regular", "Large"],
             bases: ["Arroz de sushi", "Arroz preto", "Quinoa", "Arroz basmati", "Coconut Basmati", "Espinafres", "Winter Salad"],
             sauces_base: ["Azeite", "Azeite de Limão", "Vinagrete", "Ponzu", "Sriracha Mayo", "Não leva"],
-            greens: ["Batata Doce com Alecrim", "Brócolis", "Pickle Cebola", "Beterraba", "Cenoura c/ Soja", "Milho", "Abacaxi", "Edamame", "Tomate Cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta", "Jalapeños", "Azeitonas", "Abacate", "Philadelphia", "Wakame", "Manga", "Hummus", "Hortelã (Fresca)"],
+            greens: ["Batata Doce com Alecrim", "Brócolis", "Pickle Cebola", "Beterraba", "Cenoura c/ Soja", "Milho", "Abacaxi", "Edamame", "Tomate Cherry", "Couve roxa", "Courgette", "Cenoura", "Grana Padano", "Pepino", "Feta", "Jalapeños", "Azeitonas", "Abacate", "Philadelphia", "Wakame", "Manga", "Hummus"],
             proteins: ["Salmão Braseado", "Filé de Salmão", "Frango Vietnamita", "Camarão Panado", "Frango", "Frango Teriyaki", "Camarão", "Juicy Salmon", "Juicy Tuna", "Salmão", "Atum", "Tofu Grelhado", "Ovo", "Não leva", "Wakame"],
-            sauces_final: ["Creamy Caesar", "Creme de Abacate", "Spicy Peanuts", "Mel", "Chipotle", "Sésamo Shoyu", "Sriracha Mayo", "Wasabi Mayo", "Azeite", "Azeite de Limão", "Manjericão e Hortelã", "Vinagrete", "Soja", "Teriyaki", "Ponzu", "Especial"],
+            sauces_final: ["Creamy Caesar", "Creme de Abacate", "Spicy Peanuts", "Mel", "Chipotle", "Sésamo Shoyu", "Sriracha Mayo", "Wasabi Mayo", "Azeite", "Azeite de Limão", "Manjericão e Hortelã", "Vinagrete", "Soja", "Teriyaki", "Ponzu", "Especial", "Soja e Sésamo"],
             crispies: ["Cebola frita", "Ervilhas Wasabi", "Algas Nori", "Amêndoa", "Batata Doce", "Lima", "Bacon", "Croutons", "Batata Doce Crocante", "Não leva", "Cebola Crocante"],
             sesame: ["Sim", "Não"],
             smoothie_liquid: ["Leite de Coco", "Leite", "Suco de Maçã"],
@@ -113,7 +112,7 @@
             smoothie_mode: ["Modo A", "Modo B", "Modo C", "Modo D", "Modo E", "Modo F"]
         };
 
-        // --- LISTA COMPLETA DE RECEITAS ---
+        // --- LISTA COMPLETA DE RECEITAS (V4.02 MANTIDA) ---
         const RECIPES = [
             // HOUSE BOWLS
             { id: 1, category: "HOUSE", name: "Sunny Salmon 🌞", variants: { "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] }, "Large": { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Couve roxa", "Couve roxa", "Edamame", "Edamame"], protein: ["Juicy Salmon", "Juicy Salmon", "Juicy Salmon"], sauce_final: ["Especial", "Creme de Abacate"], crispy: ["Não leva"], sesame: ["Sim"] } } },
@@ -124,14 +123,10 @@
             { id: 6, category: "HOUSE", name: "Mixed Seas 🌊", variants: { "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] }, "Large": { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Manga", "Wakame", "Cenoura", "Cenoura", "Pickle Cebola"], protein: ["Atum", "Salmão", "Salmão"], sauce_final: ["Ponzu"], crispy: ["Ervilhas Wasabi"], sesame: ["Sim"] } } },
             { id: 7, category: "HOUSE", name: "Crispy Shrimp 🦐", variants: { "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino"], protein: Array(8).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] }, "Large": { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Manga", "Pepino", "Pepino"], protein: Array(12).fill("Camarão Panado"), sauce_final: ["Teriyaki", "Sriracha Mayo"], crispy: ["Algas Nori"], sesame: ["Sim"] } } },
             { id: 8, category: "HOUSE", name: "Salmon Sushi 🍣", variants: { "Regular": { base: ["Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] }, "Large": { base: ["Arroz de sushi", "Arroz de sushi", "Arroz de sushi"], sauce_base: ["Não leva"], greens: ["Abacate", "Philadelphia", "Edamame", "Edamame"], protein: ["Salmão Braseado", "Salmão Braseado", "Salmão Braseado"], sauce_final: ["Teriyaki"], crispy: ["Cebola Crocante"], sesame: ["Sim"] } } },
-            
-            // GREEN BOWLS
             { id: 9, category: "GREEN", name: "The Caesar 🥗", variants: { "Regular": { base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Tomate Cherry", "Tomate Cherry", "Grana Padano"], protein: ["Frango", "Frango", "Frango"], sauce_final: ["Creamy Caesar"], crispy: ["Bacon", "Croutons", "Lima"], sesame: ["Não"] } } },
             { id: 10, category: "GREEN", name: "Exotic Salmon 🥗", variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Batata Doce com Alecrim", "Batata Doce com Alecrim", "Brócolis", "Abacate"], protein: ["Filé de Salmão", "Filé de Salmão", "Filé de Salmão"], sauce_final: ["Sriracha Mayo"], crispy: ["Não leva"], sesame: ["Não"] } } },
             { id: 11, category: "GREEN", name: "Velvet Garden 🥗", variants: { "Regular": { base: ["Winter Salad", "Winter Salad", "Winter Salad"], sauce_base: ["Vinagrete"], greens: ["Cenoura c/ Soja", "Beterraba", "Azeitonas", "Pickle Cebola", "Feta", "Feta", "Feta"], protein: ["Não leva"], sauce_final: ["Manjericão e Hortelã"], crispy: ["Não leva"], sesame: ["Não"] } } },
             { id: 12, category: "GREEN", name: "Cozy Chicken 🥗", variants: { "Regular": { base: ["Coconut Basmati", "Espinafres", "Espinafres"], sauce_base: ["Azeite de Limão"], greens: ["Brócolis", "Batata Doce com Alecrim", "Couve roxa", "Courgette"], protein: ["Frango Vietnamita", "Frango Vietnamita", "Frango Vietnamita"], sauce_final: ["Soja"], crispy: ["Não leva"], sesame: ["Não"] } } },
-
-            // SMOOTHIES
             { id: 13, category: "SMOOTHIE", name: "Into the Sun 💛", smoothie_liquid: ["Leite de Coco"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Manga 40g", "Manga 40g", "Ananás 30g", "Ananás 30g", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
             { id: 14, category: "SMOOTHIE", name: "Sweet Pink 🩷", smoothie_liquid: ["Leite"], smoothie_amount: ["150ml"], smoothie_ingredients: ["Morango", "Morango", "Morango", "Morango", "Banana 90g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] },
             { id: 15, category: "SMOOTHIE", name: "So Green 💚", smoothie_liquid: ["Suco de Maçã"], smoothie_amount: ["250ml"], smoothie_ingredients: ["Pepino 20g", "Abacate 45g", "Espinafre 30g", "Sumo de Lima 25g", "Gengibre 5g"], smoothie_ice: ["Gelo 60g"], smoothie_mode: ["Modo E", "Modo E"] }
@@ -143,7 +138,13 @@
         const playSound = (type) => { const AudioContext = window.AudioContext || window.webkitAudioContext; if (!AudioContext) return; const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === "happy") { osc.type = "sine"; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1); gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1); osc.start(); osc.stop(now + 0.1); } else { osc.type = "sawtooth"; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(150, now + 0.3); gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.3); osc.start(); osc.stop(now + 0.3); } };
         function shuffleArray(array) { let currentIndex = array.length, randomIndex; while (currentIndex != 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; } return array; }
 
-        // --- COMPONENTES VISUAIS ---
+        // --- VISUAL (Ocean, Rain, Typewriter replacement) ---
+        const MessageBubble = ({ text }) => (
+            <div className="font-mono text-slate-700 text-lg md:text-xl leading-relaxed bg-white/80 p-4 rounded-xl shadow-sm border border-pastel-blue-200 animate-fade-in">
+                {text}
+            </div>
+        );
+
         const OceanBackground = ({ active, partyMode }) => {
             const canvasRef = React.useRef(null);
             React.useEffect(() => {
@@ -153,10 +154,8 @@
                 const skyHeightRatio = 0.60; const seaTopHeightRatio = 0.16; 
                 const seaLayers = [ { name: "Mar 2", color: "#A0C4FF", startYRatio: skyHeightRatio, endYRatio: 1.0, wave: { amplitude: 5, wavelength: 90, speed: 0.3 } }, { name: "Mar 1", color: "#80A8FF", startYRatio: skyHeightRatio + seaTopHeightRatio, endYRatio: 1.0, wave: { amplitude: 8, wavelength: 120, speed: 0.2 } } ];
                 let surfers = []; const SURFER_EMOJIS = ['🏄‍♂️', '🏄‍♀️']; let fish = []; const FISH_EMOJIS = ['🐟', '🐠', '🐡'];
-                
-                const createSurfer = () => { const startSide = Math.random() > 0.5 ? 'LEFT' : 'RIGHT'; const horizonY = canvas.height * skyHeightRatio; const minY = horizonY + 50; const maxY = canvas.height - 50; const spawnY = minY + Math.random() * (maxY - minY); return { x: startSide === 'LEFT' ? -150 : canvas.width + 150, y: spawnY, speedX: (startSide === 'LEFT' ? 1 : -1) * (0.4 + Math.random() * 0.4), verticalDir: Math.random() > 0.5 ? 1 : -1, verticalSpeedFactor: 0.3 + Math.random() * 0.3, zigzagTimer: 0, zigzagInterval: 150 + Math.floor(Math.random() * 150), sprite: SURFER_EMOJIS[Math.floor(Math.random() * SURFER_EMOJIS.length)], sizeScale: 0.7 + Math.random() * 0.6, active: true }; };
+                const createSurfer = () => { const startSide = Math.random() > 0.5 ? 'LEFT' : 'RIGHT'; const horizonY = canvas.height * skyHeightRatio; const minY = horizonY + 50; const maxY = canvas.height - 50; const spawnY = minY + Math.random() * (maxY - minY); return { x: startSide === 'LEFT' ? -150 : canvas.width + 150, y: spawnY, speedX: (startSide === 'LEFT' ? 1 : -1) * (0.4 + Math.random() * 0.4), verticalDir: Math.random() > 0.5 ? 1 : -1, verticalSpeedFactor: 0.3 + Math.random() * 0.3, zigzagTimer: 0, zigzagInterval: 150 + Math.floor(Math.random() * 150), sprite: SURFER_EMOJIS[Math.floor(Math.random() * SURFER_EMOJIS.length)], sizeScale: 0.7 + Math.random() * 0.6, active: true, trail: [] }; };
                 const createFish = () => { const horizonY = canvas.height * skyHeightRatio; const spawnX = Math.random() * canvas.width; const spawnY = horizonY + 10; return { x: spawnX, y: spawnY, vx: (Math.random() - 0.5) * 2, vy: - (3 + Math.random() * 3), gravity: 0.15, sprite: FISH_EMOJIS[Math.floor(Math.random() * FISH_EMOJIS.length)], sizeScale: 0.5 + Math.random() * 0.3, active: true, life: 1.0, maxLife: 1.0 }; };
-
                 const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
                 window.addEventListener("resize", resize); resize();
                 let animationFrameId; let time = 0;
@@ -165,12 +164,10 @@
                     if (partyMode) { const hue = (time * 200) % 360; ctx.fillStyle = `hsl(${hue}, 70%, 85%)`; } else { ctx.fillStyle = "#FFE6F2"; }
                     ctx.fillRect(0, 0, canvas.width, horizonY + 20);
                     seaLayers.forEach(layer => { const startY = h * layer.startYRatio; const endY = h * layer.endYRatio; ctx.fillStyle = layer.color; ctx.beginPath(); ctx.moveTo(0, endY); for (let x = 0; x <= canvas.width; x += 10) { const waveY = startY + Math.sin(x / layer.wave.wavelength + time * layer.wave.speed) * layer.wave.amplitude; ctx.lineTo(x, waveY); } ctx.lineTo(canvas.width, endY); ctx.lineTo(0, endY); ctx.fill(); if(layer.endYRatio === 1.0) ctx.fillRect(0, endY - 1, canvas.width, h - endY + 1); });
-                    
                     if (surfers.length < 2 && Math.random() < 0.005) { surfers.push(createSurfer()); }
                     surfers.forEach(f => { f.x += f.speedX; f.zigzagTimer++; let nextY = f.y + (f.speedX * f.verticalDir * f.verticalSpeedFactor); if (f.verticalDir === -1 && nextY < horizonY + 40) { f.verticalDir = 1; f.zigzagTimer = 0; } else if (f.verticalDir === 1 && nextY > h - 40) { f.verticalDir = -1; f.zigzagTimer = 0; } else if (f.zigzagTimer > f.zigzagInterval) { f.verticalDir *= -1; f.zigzagTimer = 0; } f.y += Math.abs(f.speedX) * f.verticalDir * f.verticalSpeedFactor; f.y += Math.sin(time * 2 + f.x * 0.01) * 0.5; if(f.x < -200 || f.x > canvas.width + 200) { f.active = false; } });
                     surfers = surfers.filter(f => f.active);
                     surfers.forEach(f => { ctx.font=`${Math.max(24,f.sizeScale*40)}px sans-serif`; ctx.shadowColor = "rgba(0,80,150,0.2)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 5; ctx.fillText(f.sprite,f.x,f.y); ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; });
-
                     if (fish.length < 3 && Math.random() < 0.01) { fish.push(createFish()); }
                     fish.forEach(f => { f.vy += f.gravity; f.x += f.vx; f.y += f.vy; if (f.y > horizonY + 50 && f.vy > 0) { f.active = false; } });
                     fish = fish.filter(f => f.active);
@@ -220,12 +217,6 @@
             return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-50" />;
         };
 
-        const TypewriterMessage = ({ text }) => {
-            const [display, setDisplay] = React.useState("");
-            React.useEffect(() => { let i = 0; setDisplay(""); const interval = setInterval(() => { if (i < text.length) { setDisplay(prev => prev + text.charAt(i)); i++; } else { clearInterval(interval); } }, 30); return () => clearInterval(interval); }, [text]);
-            return <div className="font-mono text-slate-700 text-lg md:text-xl leading-relaxed typing-cursor bg-white/80 p-4 rounded-xl shadow-sm border border-pastel-blue-200">{display}</div>;
-        };
-
         const PopupModal = ({ message, onConfirm }) => (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm animate-fade-in">
                 <div className="bg-white p-6 rounded-2xl shadow-2xl border-2 border-pastel-blue-300 max-w-sm w-full mx-4 text-center transform scale-100 animate-bounce-in">
@@ -235,6 +226,18 @@
             </div>
         );
 
+        const ChangelogModal = ({ onClose }) => (
+            <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+                <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto shadow-2xl relative">
+                    <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                    <h3 className="font-bold text-2xl mb-6 text-pastel-blue-500 flex items-center gap-2"><IconList /> Histórico de Versões</h3>
+                    <div className="space-y-6">{CHANGELOG.map((item, index) => (<div key={index} className="border-l-4 border-pastel-blue-200 pl-4"><div className="flex justify-between items-baseline mb-1"><span className="font-bold text-lg text-slate-700">v{item.version}</span><span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{item.date}</span></div><ul className="list-disc list-inside text-sm text-slate-600 space-y-1">{item.changes.map((change, i) => (<li key={i}>{change}</li>))}</ul></div>))}</div>
+                    <div className="mt-8 pt-4 border-t border-slate-100 text-center"><button onClick={onClose} className="bg-slate-100 text-slate-600 px-6 py-2 rounded-full font-bold text-sm hover:bg-slate-200 transition-colors">Fechar</button></div>
+                </div>
+            </div>
+        );
+
+        // --- APP PRINCIPAL ---
         function App() {
             const [gameState, setGameState] = React.useState("HOME");
             const [menuCategory, setMenuCategory] = React.useState(null); 
@@ -272,7 +275,8 @@
             
             React.useEffect(() => {
                 if (gameState === "PLAYING" && selectedRecipe) {
-                    const activePhases = getCurrentPhases(); const phaseKey = activePhases[currentPhaseIndex].key;
+                    const activePhases = getCurrentPhases();
+                    const phaseKey = activePhases[currentPhaseIndex].key;
                     if (phaseKey === "size") { setPhaseOptions(INGREDIENTS_DB.sizes); return; }
                     let fullList = getFullIngredientList(phaseKey);
                     let requiredIngs = [];
@@ -304,7 +308,28 @@
             const initCustomGame = () => { const isFemale = Math.random() > 0.5; const nameList = isFemale ? PA_NAMES.FEMALE : PA_NAMES.MALE; const emojiList = isFemale ? PA_EMOJIS.FEMALE : PA_EMOJIS.MALE; setPaPersona({ name: nameList[Math.floor(Math.random() * nameList.length)], emoji: emojiList[Math.floor(Math.random() * emojiList.length)] }); setGameState("CUSTOM_BOWL"); setCustomPhase(1); setAllSelections({}); setCurrentSelections([]); };
             const handleCustomSize = (size) => { setAllSelections(prev => ({...prev, size: size})); setCustomPhase(4); setCurrentSelections([]); };
             const handleCustomNext = () => { if (customPhase === 1) setCustomPhase(2); else if (customPhase === 4) setCustomPhase(5); else if (customPhase === 5) setCustomPhase(6); else if (customPhase === 6) setCustomPhase(7); else if (customPhase === 7) setCustomPhase(8); else if (customPhase === 8) setCustomPhase(9); setCurrentSelections([]); };
-            const handleCustomBack = () => { if (customPhase > 1) { setCustomPhase(prev => prev - 1); setCurrentSelections([]); } else { setGameState("HOME"); } };
+            
+            // CORREÇÃO: BOTÃO VOLTAR/DESFAZER
+            const handleCustomBack = () => {
+                // Se houver itens selecionados na etapa atual, remove o último
+                if (currentSelections.length > 0) {
+                    const newSel = [...currentSelections];
+                    newSel.pop();
+                    setCurrentSelections(newSel);
+                    return;
+                }
+                
+                // Se não houver, volta a fase
+                if (customPhase > 1) { 
+                    // Pula a fase 3 se voltar da 4 (porque a 3 é a escolha de tamanho que já foi feita)
+                    const prevPhase = customPhase === 4 ? 3 : customPhase - 1;
+                    setCustomPhase(prevPhase); 
+                    setCurrentSelections([]); 
+                } else { 
+                    setGameState("HOME"); 
+                }
+            };
+
             const handleCustomSelection = (item, type) => {
                 const popupTrigger = (msg) => setShowPopup({ msg, callback: () => addCustomItem(item, type) });
                 if (type === 'base' && item === "Espinafres") return popupTrigger("Posso colocar um pouco de Azeite, se quiseres?");
@@ -319,18 +344,19 @@
                 if (type === 'base') limit = 2; if (type === 'green') limit = size === "Large" ? 5 : 4; if (type === 'protein') limit = size === "Large" ? 3 : 2; if (type === 'sauce') limit = 1; if (type === 'crispy') limit = 2;
                 if (currentSelections.length < limit || (type === 'sauce' && currentSelections.length < 1)) { if (type === 'sauce') setCurrentSelections([item]); else setCurrentSelections(prev => [...prev, item]); playSound("happy"); }
             };
+            
             const renderCustomBowl = () => {
                 const size = allSelections['size'] || "Regular";
                 switch(customPhase) {
-                    case 1: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><div className="text-6xl animate-bounce">{paPersona.emoji}</div><TypewriterMessage text={`Olá, tudo bem? Me chamo ${paPersona.name}, seja bem vind@! Já conhece a Poke House? Vou ajudar-te a escolher a bowl perfeita para si. Aqui está o nosso menu, podes escolher uma de nossas receitas ou criar sua própria. Quer criar a sua? Ótimo!`} /><button onClick={handleCustomNext} className="bg-pastel-blue-500 text-white px-8 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-pastel-blue-400 transition-all active:scale-95 animate-wiggle">Vamos nessa! 🤙</button></div> );
-                    case 2: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><TypewriterMessage text="Sua bowl é para comer aqui ou para levar?" /><div className="flex gap-4"><button onClick={() => setCustomPhase(3)} className="bg-white border-2 border-pastel-blue-300 text-pastel-blue-500 px-8 py-4 rounded-2xl font-bold text-xl shadow-md hover:bg-pastel-blue-50 active:scale-95">COMER AQUI</button><button onClick={() => setShowPopup({ msg: "Só para informar a caixa para levar tem um custo de 20cent, tudo bem?", callback: () => { setShowPopup(null); setCustomPhase(3); } })} className="bg-white border-2 border-pastel-pink-300 text-pastel-pink-500 px-8 py-4 rounded-2xl font-bold text-xl shadow-md hover:bg-pastel-pink-50 active:scale-95">LEVAR</button></div></div> );
-                    case 3: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><TypewriterMessage text="Preferes o tamanho Large ou Regular?" /><div className="flex gap-4"><button onClick={() => handleCustomSize("Large")} className="bg-pastel-blue-500 text-white px-8 py-6 rounded-2xl font-bold text-2xl shadow-lg active:scale-95">LARGE</button><button onClick={() => handleCustomSize("Regular")} className="bg-pastel-green text-slate-700 px-8 py-6 rounded-2xl font-bold text-xl shadow-lg active:scale-95">Regular</button></div></div> );
-                    case 4: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><TypewriterMessage text="Podes escolher até 2 bases. Temos essas disponíveis:" /></div><div className="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.bases.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'base')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> );
-                    case 5: { const limit = size === "Large" ? 5 : 4; return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><TypewriterMessage text={`Podes escolher agora - ${limit} - greens!`} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.greens.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'green')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 text-sm relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> ); }
-                    case 6: { const limit = size === "Large" ? 3 : 2; const proteins = INGREDIENTS_DB.proteins.filter(p => p !== "Wakame"); return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><TypewriterMessage text={`Podes escolher - ${limit} - proteínas!`} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{proteins.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'protein')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{currentSelections.filter(i => i === ing).length}</span>}</button>))}</div></div> ); }
-                    case 7: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><TypewriterMessage text="Podes escolher um molho!" /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.sauces_final.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'sauce')} className={`p-4 rounded-xl shadow-sm font-bold text-slate-700 border transition-all ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 border-pastel-blue-500' : 'bg-white border-pastel-blue-200'}`}>{ing}</button>))}</div></div> );
-                    case 8: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><TypewriterMessage text="Podes escolher 2 crispys!" /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.crispies.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'crispy')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> );
-                    case 9: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><TypewriterMessage text="Aceita sésamo de oferta?" /><div className="flex gap-4"><button onClick={() => setCustomPhase(10)} className="bg-pastel-blue-500 text-white px-10 py-6 rounded-2xl font-bold text-2xl shadow-lg active:scale-95">Sim</button><button onClick={() => setCustomPhase(10)} className="bg-white border-2 border-slate-200 text-slate-500 px-10 py-6 rounded-2xl font-bold text-2xl shadow-md active:scale-95">Não</button></div></div> );
+                    case 1: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><div className="text-6xl animate-bounce">{paPersona.emoji}</div><MessageBubble text={`Olá, tudo bem? Me chamo ${paPersona.name}, seja bem vind@! Já conhece a Poke House? Vou ajudar-te a escolher a bowl perfeita para si. Aqui está o nosso menu, podes escolher uma de nossas receitas ou criar sua própria. Quer criar a sua? Ótimo!`} /><button onClick={handleCustomNext} className="bg-pastel-blue-500 text-white px-8 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-pastel-blue-400 transition-all active:scale-95 animate-wiggle">Vamos nessa! 🤙</button></div> );
+                    case 2: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><MessageBubble text="Sua bowl é para comer aqui ou para levar?" /><div className="flex gap-4"><button onClick={() => setCustomPhase(3)} className="bg-white border-2 border-pastel-blue-300 text-pastel-blue-500 px-8 py-4 rounded-2xl font-bold text-xl shadow-md hover:bg-pastel-blue-50 active:scale-95">COMER AQUI</button><button onClick={() => setShowPopup({ msg: "Só para informar a caixa para levar tem um custo de 20cent, tudo bem?", callback: () => { setShowPopup(null); setCustomPhase(3); } })} className="bg-white border-2 border-pastel-pink-300 text-pastel-pink-500 px-8 py-4 rounded-2xl font-bold text-xl shadow-md hover:bg-pastel-pink-50 active:scale-95">LEVAR</button></div></div> );
+                    case 3: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><MessageBubble text="Preferes o tamanho Large ou Regular?" /><div className="flex gap-4"><button onClick={() => handleCustomSize("Large")} className="bg-pastel-blue-500 text-white px-8 py-6 rounded-2xl font-bold text-2xl shadow-lg active:scale-95">LARGE</button><button onClick={() => handleCustomSize("Regular")} className="bg-pastel-green text-slate-700 px-8 py-6 rounded-2xl font-bold text-2xl shadow-lg active:scale-95">REGULAR</button></div></div> );
+                    case 4: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><MessageBubble text="Podes escolher até 2 bases. Temos essas disponíveis:" /></div><div className="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.bases.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'base')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> );
+                    case 5: { const limit = size === "Large" ? 5 : 4; return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><MessageBubble text={`Podes escolher agora - ${limit} - greens!`} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.greens.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'green')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 text-sm relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> ); }
+                    case 6: { const limit = size === "Large" ? 3 : 2; const proteins = INGREDIENTS_DB.proteins.filter(p => p !== "Wakame"); return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><MessageBubble text={`Podes escolher - ${limit} - proteínas!`} /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{proteins.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'protein')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{currentSelections.filter(i => i === ing).length}</span>}</button>))}</div></div> ); }
+                    case 7: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><MessageBubble text="Podes escolher um molho!" /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.sauces_final.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'sauce')} className={`p-4 rounded-xl shadow-sm font-bold text-slate-700 border transition-all ${currentSelections.includes(ing) ? 'bg-pastel-blue-100 border-pastel-blue-500' : 'bg-white border-pastel-blue-200'}`}>{ing}</button>))}</div></div> );
+                    case 8: return ( <div className="flex flex-col h-full p-4"><div className="mb-4"><MessageBubble text="Podes escolher 2 crispys!" /></div><div className="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-3 pb-20">{INGREDIENTS_DB.crispies.map(ing => (<button key={ing} onClick={() => handleCustomSelection(ing, 'crispy')} className="bg-white border border-pastel-blue-200 p-4 rounded-xl shadow-sm hover:border-pastel-blue-400 font-bold text-slate-700 relative">{ing}{currentSelections.filter(i => i === ing).length > 0 && <span className="absolute top-1 right-1 bg-green-500 w-3 h-3 rounded-full"></span>}</button>))}</div></div> );
+                    case 9: return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8"><MessageBubble text="Aceita sésamo de oferta?" /><div className="flex gap-4"><button onClick={() => setCustomPhase(10)} className="bg-pastel-blue-500 text-white px-10 py-6 rounded-2xl font-bold text-2xl shadow-lg active:scale-95">Sim</button><button onClick={() => setCustomPhase(10)} className="bg-white border-2 border-slate-200 text-slate-500 px-10 py-6 rounded-2xl font-bold text-2xl shadow-md active:scale-95">Não</button></div></div> );
                     case 10: const finalPhrase = FINAL_CUSTOM_PHRASES[Math.floor(Math.random() * FINAL_CUSTOM_PHRASES.length)]; return ( <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-8 animate-bounce-in"><div className="text-6xl">🎉</div><h2 className="text-3xl font-extrabold text-pastel-blue-500">{finalPhrase}</h2><button onClick={resetToHome} className="bg-pastel-green text-slate-800 px-8 py-4 rounded-full font-bold shadow-lg hover:bg-green-300 transition-transform active:scale-95 flex items-center justify-center gap-2"><IconHome /> Voltar ao Início</button></div> );
                     default: return null;
                 }
@@ -363,7 +389,7 @@
                         {gameState === "HOME" && ( <div className="hidden md:flex flex-col items-center justify-center text-center bg-pastel-blue-100/40 p-10 rounded-3xl backdrop-blur-sm shadow-xl max-w-lg"><img src="https://storage.googleapis.com/ikona-bucket-production/images/5db193be3ea71a0001bb09f7/EXTENDED%20VERSION_original%20colors-617ac363073e550017b9966b.png" alt="Poke House Logo" className="h-20 mb-6 object-contain" /><p className="text-pastel-blue-500 font-bold text-2xl mb-4">Bem-vindo ao Treino Poke House!</p><p className="text-slate-700 mb-6">Selecione uma categoria no menu para começar seu treinamento.</p><div className="mt-4 text-6xl animate-bounce">🥗</div></div> )}
                     </div>
                     
-                    <div className="fixed bottom-1 right-2 z-50"><button onClick={() => setShowChangelog(true)} className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none">v4.02 BETA</button></div>
+                    <div className="fixed bottom-1 right-2 z-50"><button onClick={() => setShowChangelog(true)} className="text-xs text-slate-500/60 font-sans hover:text-pastel-blue-500 hover:underline transition-colors select-none">v4.03 BETA</button></div>
                     {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
                 </div>
             );
